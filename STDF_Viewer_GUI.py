@@ -6,7 +6,7 @@ from PyQt5.QtGui import *
 from stdf.stdf_reader import Reader
 from stdf.stdf_writer import Writer
 import logging
-from pathlib import Path
+import qtawesome as qta
 import time
 
 
@@ -14,14 +14,23 @@ class Application(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.setupUI()
+        self.index_in_same_record = 0
+        self.current_row = 0
 
     def setupUI(self):
         # 设置标题与初始大小
         self.setWindowTitle('STDF Viewer Beta V0.1')
-        self.resize(500, 300)
+        self.resize(1000, 600)
 
         self.table = QTableWidget(self)
         self.record_content_table = QTableWidget(self)
+        # Button show next record
+        self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
+        self.show_next_record.clicked.connect(self.show_next_content_table)
+
+        # Button show previous record
+        self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
+        self.show_previous_record.clicked.connect(self.show_previous_content_table)
 
         row_num = len(stdf_dic)
         col_num = 4
@@ -54,18 +63,38 @@ class Application(QWidget):
         # 设置布局
         layout = QHBoxLayout()
         layout.addWidget(self.table)
+        layout2 = QGridLayout()
+        layout2.addWidget(self.show_previous_record, 0,0)
+        layout2.addWidget(self.show_next_record, 0, 1)
+        self.record_content_table.setLayout(layout2)
+        # layout2.addWidget(self.record_content_table, 1, 0)
         layout.addWidget(self.record_content_table)
         self.setLayout(layout)
 
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.table.cellClicked.connect(self.show_record)
+        self.table.cellClicked.connect(self.show_content_table)
 
-    def show_record(self, row, col):
+    def show_content_table(self, row, col):
+        self.index_in_same_record = 0
+        self.show_record(row, col, self.index_in_same_record)
+
+    def show_next_content_table(self):
+        self.index_in_same_record += 1
+        self.show_record(self.current_row, 0, self.index_in_same_record)
+
+    def show_previous_content_table(self):
+        self.index_in_same_record -= 1
+        if self.index_in_same_record < 0:
+            self.index_in_same_record = 0
+        self.show_record(self.current_row, 0, self.index_in_same_record)
+
+    def show_record(self, row, col, index):
         # Get cell text
+        self.current_row = row
         key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
         # Enable STDF record read procedure
-        position = stdf_dic[key][0]
+        position = stdf_dic[key][index]
         stdf.STDF_IO.seek(position)
         rec_name, header, body = stdf.read_record()
         # Refresh the content table
