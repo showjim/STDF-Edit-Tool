@@ -8,6 +8,7 @@ from stdf.stdf_writer import Writer
 import logging
 import qtawesome as qta
 import time
+import gzip
 
 
 class Application(QWidget):
@@ -24,6 +25,12 @@ class Application(QWidget):
 
         self.table = QTableWidget(self)
         self.record_content_table = QTableWidget(self)
+        # Load STDF
+        self.load_stdf_button = QPushButton(qta.icon('mdi.folder-open', color='blue'), '')
+        self.load_stdf_button.clicked.connect(self.load_stdf)
+        # Save STDF
+        self.save_stdf_button = QPushButton(qta.icon('mdi.content-save', color='blue'), '')
+        self.save_stdf_button.clicked.connect(self.save_stdf)
         # Button show next record
         self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
         self.show_next_record.clicked.connect(self.show_next_content_table)
@@ -32,7 +39,7 @@ class Application(QWidget):
         self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
         self.show_previous_record.clicked.connect(self.show_previous_content_table)
 
-        row_num = len(stdf_dic)
+        row_num = 0 #len(self.stdf_dic)
         col_num = 4
 
         self.table.setRowCount(row_num)
@@ -43,9 +50,31 @@ class Application(QWidget):
         self.record_content_table.setColumnCount(3)
         self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
 
+        # 设置布局
+        layout = QGridLayout()
+        layout.addWidget(self.load_stdf_button, 0, 0, 1, 1)
+        layout.addWidget(self.table, 1, 0, 32, 18)
+        # layout2 = QGridLayout()
+        layout.addWidget(self.show_previous_record, 1, 19, 1, 1)
+        layout.addWidget(self.show_next_record, 1, 20, 1, 1)
+        # self.record_content_table.setLayout(layout2)
+        layout.addWidget(self.record_content_table, 2, 19, 31, 12)
+        # layout.addWidget(self.record_content_table)
+        self.setLayout(layout)
+
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.cellClicked.connect(self.show_content_table)
+
+    def show_table(self):
+        row_num = len(self.stdf_dic)
+        col_num = 4
+
+        self.table.setRowCount(row_num)
+        self.table.setColumnCount(col_num)
         # Fill STDF data to table
         i = 0  # row index
-        for key, val in stdf_dic.items():
+        for key, val in self.stdf_dic.items():
             index_rec_list = key.split(' - ')
             index = index_rec_list[0]
             rec = index_rec_list[1]
@@ -60,20 +89,6 @@ class Application(QWidget):
             self.table.setItem(i, 2, cnt_item)
             self.table.setItem(i, 3, pos_item)
             i += 1
-        # 设置布局
-        layout = QGridLayout()
-        layout.addWidget(self.table, 0, 0, 32, 18)
-        # layout2 = QGridLayout()
-        layout.addWidget(self.show_previous_record, 0, 19, 1, 1)
-        layout.addWidget(self.show_next_record, 0, 20, 1, 1)
-        # self.record_content_table.setLayout(layout2)
-        layout.addWidget(self.record_content_table, 1, 19, 31, 12)
-        # layout.addWidget(self.record_content_table)
-        self.setLayout(layout)
-
-        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.table.cellClicked.connect(self.show_content_table)
 
     def show_content_table(self, row, col):
         self.index_in_same_record = 0
@@ -92,11 +107,11 @@ class Application(QWidget):
         self.current_row = row
         key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
         # Enable STDF record read procedure
-        if index < 0 or index > len(stdf_dic[key]):
+        if index < 0 or index > len(self.stdf_dic[key]) - 1:
             index = 0
-        position = stdf_dic[key][index]
-        stdf.STDF_IO.seek(position)
-        rec_name, header, body = stdf.read_record()
+        position = self.stdf_dic[key][index]
+        self.stdf.STDF_IO.seek(position)
+        rec_name, header, body = self.stdf.read_record()
         # Refresh the content table
         self.record_content_table.setRowCount(len(body))
         self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
@@ -111,34 +126,58 @@ class Application(QWidget):
             print(str(k) + ": " + str(v))
             i += 1
 
-
-def get_all_records(stdf):
-    stdf.read_rec_list = True
-    stdf_dic = {}
-    i = 0
-    j = 1  # same record cnt
-    last_rec = ''
-    tmp_list = []
-    for rec_name, position in stdf:
-        tmp_list = [position]
-        if rec_name == last_rec:
-            stdf_dic[key] = stdf_dic[key] + tmp_list
+    def load_stdf(self):
+        filterboi = 'STDF (*.stdf *.std);;GZ (*.stdf.gz *.std.gz)'
+        filepath = QFileDialog.getOpenFileNames(
+            caption='Open STDF or GZ File', filter=filterboi)
+        # Open std file/s
+        if len(filepath[0]) == 0:
+            pass
         else:
-            key = str(i) + ' - ' + rec_name
-            stdf_dic[key] = tmp_list
-            tmp_list = []
-        i += 1
-        last_rec = rec_name
-    stdf.read_rec_list = False
-    return stdf_dic
+            if len(filepath[0]) == 1:
+                filename = filepath[0][0]
+                if filename.endswith(".std") or filename.endswith(".stdf"):
+                    f = open(filename, 'rb')
+                elif filename.endswith(".gz"):
+                    f = gzip.open(filename, 'rb')
+
+                self.stdf = Reader()
+                self.stdf.load_stdf_file(stdf_file=filename)
+                self.stdf_dic = self.get_all_records(self.stdf)
+                self.show_table()
+            else:
+                pass
+
+    def save_stdf(self):
+        pass
+
+    def get_all_records(self, stdf):
+        stdf.read_rec_list = True
+        stdf_dic = {}
+        i = 0
+        j = 1  # same record cnt
+        last_rec = ''
+        tmp_list = []
+        for rec_name, position in stdf:
+            tmp_list = [position]
+            if rec_name == last_rec:
+                stdf_dic[key] = stdf_dic[key] + tmp_list
+            else:
+                key = str(i) + ' - ' + rec_name
+                stdf_dic[key] = tmp_list
+                tmp_list = []
+            i += 1
+            last_rec = rec_name
+        stdf.read_rec_list = False
+        return stdf_dic
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    in_file = r'./sample_stdf/a595.stdf'
-    stdf = Reader()
-    stdf.load_stdf_file(stdf_file=in_file)
-    stdf_dic = get_all_records(stdf)
+    # in_file = r'./sample_stdf/a595.stdf'
+    # stdf = Reader()
+    # stdf.load_stdf_file(stdf_file=in_file)
+    # stdf_dic = get_all_records(stdf)
 
     app = QApplication(sys.argv)
     viewer = Application()
