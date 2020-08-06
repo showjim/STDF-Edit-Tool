@@ -28,30 +28,21 @@ class Application(QWidget):
         self.table.setHorizontalHeaderLabels(['Index', 'Records', 'Count','Position'])
 
         i = 0 # row index
-        j = 1 # same record cnt
-        last_rec = ''
         for key, val in stdf_dic.items():
             index_rec_list = key.split(' - ')
             index = index_rec_list[0]
             rec = index_rec_list[1]
 
-            if rec == last_rec:
-                j += 1
-            else:
+            index_item = QTableWidgetItem(index)
+            rec_item = QTableWidgetItem(rec)
+            cnt_item = QTableWidgetItem(str(len(val)))
+            pos_item = QTableWidgetItem(str(val[0]))
 
-                index_item = QTableWidgetItem(index)
-                rec_item = QTableWidgetItem(rec)
-                cnt_item = QTableWidgetItem(str(j))
-                pos_item = QTableWidgetItem(str(val))
-                j = 1
-
-                self.table.setItem(i, 0, index_item)
-                self.table.setItem(i, 1, rec_item)
-                self.table.setItem(i, 2, cnt_item)
-                self.table.setItem(i, 3, pos_item)
-                i += 1
-            last_rec = rec
-        self.table.setRowCount(i)
+            self.table.setItem(i, 0, index_item)
+            self.table.setItem(i, 1, rec_item)
+            self.table.setItem(i, 2, cnt_item)
+            self.table.setItem(i, 3, pos_item)
+            i += 1
         # 设置布局
         layout = QVBoxLayout()
         layout.addWidget(self.table)
@@ -62,9 +53,18 @@ def get_all_records(stdf):
     stdf.read_rec_list = True
     stdf_dic = {}
     i = 0
+    j = 1  # same record cnt
+    last_rec = ''
+    tmp_list = []
     for rec_name, position in stdf:
-        stdf_dic[str(i) + ' - ' + rec_name] = position
+        tmp_list.append(position)
+        if rec_name == last_rec:
+            pass
+        else:
+            stdf_dic[str(i) + ' - ' + rec_name] = tmp_list
+            tmp_list = []
         i += 1
+        last_rec = rec_name
     stdf.read_rec_list = False
     return stdf_dic
 
