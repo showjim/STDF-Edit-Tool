@@ -61,14 +61,14 @@ class Application(QWidget):
             self.table.setItem(i, 3, pos_item)
             i += 1
         # 设置布局
-        layout = QHBoxLayout()
-        layout.addWidget(self.table)
-        layout2 = QGridLayout()
-        layout2.addWidget(self.show_previous_record, 0,0)
-        layout2.addWidget(self.show_next_record, 0, 1)
-        self.record_content_table.setLayout(layout2)
-        # layout2.addWidget(self.record_content_table, 1, 0)
-        layout.addWidget(self.record_content_table)
+        layout = QGridLayout()
+        layout.addWidget(self.table, 0, 0, 32, 18)
+        # layout2 = QGridLayout()
+        layout.addWidget(self.show_previous_record, 0, 19, 1, 1)
+        layout.addWidget(self.show_next_record, 0, 20, 1, 1)
+        # self.record_content_table.setLayout(layout2)
+        layout.addWidget(self.record_content_table, 1, 19, 31, 12)
+        # layout.addWidget(self.record_content_table)
         self.setLayout(layout)
 
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -85,8 +85,6 @@ class Application(QWidget):
 
     def show_previous_content_table(self):
         self.index_in_same_record -= 1
-        if self.index_in_same_record < 0:
-            self.index_in_same_record = 0
         self.show_record(self.current_row, 0, self.index_in_same_record)
 
     def show_record(self, row, col, index):
@@ -94,6 +92,8 @@ class Application(QWidget):
         self.current_row = row
         key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
         # Enable STDF record read procedure
+        if index < 0 or index > len(stdf_dic[key]):
+            index = 0
         position = stdf_dic[key][index]
         stdf.STDF_IO.seek(position)
         rec_name, header, body = stdf.read_record()
@@ -120,11 +120,12 @@ def get_all_records(stdf):
     last_rec = ''
     tmp_list = []
     for rec_name, position in stdf:
-        tmp_list.append(position)
+        tmp_list = [position]
         if rec_name == last_rec:
-            pass
+            stdf_dic[key] = stdf_dic[key] + tmp_list
         else:
-            stdf_dic[str(i) + ' - ' + rec_name] = tmp_list
+            key = str(i) + ' - ' + rec_name
+            stdf_dic[key] = tmp_list
             tmp_list = []
         i += 1
         last_rec = rec_name
