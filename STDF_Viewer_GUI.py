@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -7,6 +8,7 @@ from stdf.stdf_writer import Writer
 import logging
 from pathlib import Path
 import time
+
 
 class Application(QWidget):
     def __init__(self, parent=None):
@@ -19,15 +21,21 @@ class Application(QWidget):
         self.resize(500, 300)
 
         self.table = QTableWidget(self)
+        self.record_content_table = QTableWidget(self)
 
         row_num = len(stdf_dic)
         col_num = 4
 
         self.table.setRowCount(row_num)
         self.table.setColumnCount(col_num)
-        self.table.setHorizontalHeaderLabels(['Index', 'Records', 'Count','Position'])
+        self.table.setHorizontalHeaderLabels(['Index', 'Records', 'Count', 'Position'])
 
-        i = 0 # row index
+        self.record_content_table.setRowCount(0)
+        self.record_content_table.setColumnCount(3)
+        self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
+
+        # Fill STDF data to table
+        i = 0  # row index
         for key, val in stdf_dic.items():
             index_rec_list = key.split(' - ')
             index = index_rec_list[0]
@@ -44,9 +52,35 @@ class Application(QWidget):
             self.table.setItem(i, 3, pos_item)
             i += 1
         # 设置布局
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
         layout.addWidget(self.table)
+        layout.addWidget(self.record_content_table)
         self.setLayout(layout)
+
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.cellClicked.connect(self.show_record)
+
+    def show_record(self, row, col):
+        # Get cell text
+        key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
+        # Enable STDF record read procedure
+        position = stdf_dic[key][0]
+        stdf.STDF_IO.seek(position)
+        rec_name, header, body = stdf.read_record()
+        # Refresh the content table
+        self.record_content_table.setRowCount(len(body))
+        self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
+        self.record_content_table.setColumnCount(3)
+        # Fill the content table
+        i = 0
+        for k, v in body.items():
+            field_item = QTableWidgetItem(str(k))
+            val_item = QTableWidgetItem(str(v))
+            self.record_content_table.setItem(i, 0, field_item)
+            self.record_content_table.setItem(i, 2, val_item)
+            print(str(k) + ": " + str(v))
+            i += 1
 
 
 def get_all_records(stdf):
@@ -68,13 +102,13 @@ def get_all_records(stdf):
     stdf.read_rec_list = False
     return stdf_dic
 
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     in_file = r'./sample_stdf/a595.stdf'
     stdf = Reader()
     stdf.load_stdf_file(stdf_file=in_file)
     stdf_dic = get_all_records(stdf)
-
 
     app = QApplication(sys.argv)
     viewer = Application()
