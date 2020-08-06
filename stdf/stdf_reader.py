@@ -79,7 +79,8 @@ class Reader:
 
     def load_stdf_file(self, stdf_file):
         self.log.info('opening STDF file = {}'.format(stdf_file))
-        with open(stdf_file, mode='rb') as fs:
+        with open(stdf_file, mode='r+b') as fs:
+            # self.fs = io.BytesIO(fs.write())
             self.STDF_IO = io.BytesIO(fs.read())
         self.log.info('detecting STDF file size = {}'.format(len(self.STDF_IO.getvalue())))
 
@@ -138,7 +139,7 @@ class Reader:
     def _read_body(self, rec_size):
         self.body_start = self.STDF_IO.tell()
         body_raw = io.BytesIO(self.STDF_IO.read(rec_size))
-        assert len(body_raw.getvalue()) == rec_size
+        # assert len(body_raw.getvalue()) == rec_size
         return body_raw
 
     def _unpack_body(self, header, body_raw):

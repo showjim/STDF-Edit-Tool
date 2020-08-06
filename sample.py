@@ -20,6 +20,7 @@ from stdf.stdf_writer import Writer
 import logging
 from pathlib import Path
 import time
+import struct
 
 __author__ = 'Jerry Zhou'
 
@@ -38,24 +39,30 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     in_file = r'./sample_stdf/a595.stdf'
 
-    stdf = Reader()
-    stdf.load_stdf_file(stdf_file=in_file)
-    startt = time.time()
-    stdf_dic = get_all_records(stdf)
-    if stdf_dic:
-        with open('output.txt', mode='wt', encoding='utf-8') as fout:
-            # for rec_name, header, body in stdf:
-            for item in stdf_dic:
-                fout.write(item)
-
-                positon = stdf_dic[item]
-                stdf.STDF_IO.seek(positon)
-                rec_name, header, body = stdf.read_record()
-                for k, v in body.items():
-                    fout.write('.')
-                    fout.write(str(k) + ": " + str(v))
-                    fout.write('|')
-
-                fout.write('\n')
-    endt = time.time()
-    print('读取时间：', endt - startt)
+    # stdf = Reader()
+    # stdf.load_stdf_file(stdf_file=in_file)
+    # startt = time.time()
+    # stdf_dic = get_all_records(stdf)
+    # if stdf_dic:
+    #     with open('output.txt', mode='wt', encoding='utf-8') as fout:
+    #         # for rec_name, header, body in stdf:
+    #         for item in stdf_dic:
+    #             fout.write(item)
+    #
+    #             positon = stdf_dic[item]
+    #             stdf.STDF_IO.seek(positon)
+    #             rec_name, header, body = stdf.read_record()
+    #             for k, v in body.items():
+    #                 fout.write('.')
+    #                 fout.write(str(k) + ": " + str(v))
+    #                 fout.write('|')
+    #
+    #             fout.write('\n')
+    # endt = time.time()
+    # print('读取时间：', endt - startt)
+    w = Writer(r'./stdf/stdf_v4.json')
+    data = {'CPU_TYPE': 2,
+            'STDF_VER': 4}
+    with open('test.std', mode='wb') as fout:
+        tmp = w.pack_record('FAR', data)
+        fout.write(tmp)

@@ -17,6 +17,7 @@ class Application(QWidget):
         self.setupUI()
         self.index_in_same_record = 0
         self.current_row = 0
+        self.w = Writer(r'./stdf/stdf_v4.json')
 
     def setupUI(self):
         # 设置标题与初始大小
@@ -34,6 +35,9 @@ class Application(QWidget):
         # Button show next record
         self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
         self.show_next_record.clicked.connect(self.show_next_content_table)
+        # Update modification button
+        self.update_mod_record = QPushButton(qta.icon('mdi.arrow-up-bold-box-outline', color='green'), '')
+        self.update_mod_record.clicked.connect(self.modify_content_table)
 
         # Button show previous record
         self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
@@ -53,6 +57,8 @@ class Application(QWidget):
         # 设置布局
         layout = QGridLayout()
         layout.addWidget(self.load_stdf_button, 0, 0, 1, 1)
+        layout.addWidget(self.save_stdf_button, 0, 1, 1, 1)
+        layout.addWidget(self.update_mod_record, 0, 2, 1, 1)
         layout.addWidget(self.table, 1, 0, 32, 18)
         # layout2 = QGridLayout()
         layout.addWidget(self.show_previous_record, 1, 19, 1, 1)
@@ -64,7 +70,25 @@ class Application(QWidget):
 
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.table.cellClicked.connect(self.show_content_table)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        self.table.cellDoubleClicked.connect(self.show_content_table)
+        # self.record_content_table.itemChanged.connect(self.modify_content_table)
+
+    def modify_content_table(self):
+        data = {}
+        for row in range(self.record_content_table.rowCount()):
+            tmp_field = self.record_content_table.item(row, 0).text()
+            tmp_val = self.record_content_table.item(row, 2).text()
+            data[tmp_field] = int(tmp_val)
+        # tmp = self.w.pack_record('FAR', data)
+        # self.stdf.STDF_IO.seek(self.position)
+        # self.stdf.STDF_IO.write(tmp)
+        with open(self.filename, mode='rb+') as fout:
+            tmp = self.w.pack_record('FAR', data)
+            fout.seek(self.position)
+            fout.write(tmp)
+            fout.flush()
 
     def show_table(self):
         row_num = len(self.stdf_dic)
@@ -109,8 +133,8 @@ class Application(QWidget):
         # Enable STDF record read procedure
         if index < 0 or index > len(self.stdf_dic[key]) - 1:
             index = 0
-        position = self.stdf_dic[key][index]
-        self.stdf.STDF_IO.seek(position)
+        self.position = self.stdf_dic[key][index]
+        self.stdf.STDF_IO.seek(self.position)
         rec_name, header, body = self.stdf.read_record()
         # Refresh the content table
         self.record_content_table.setRowCount(len(body))
@@ -120,7 +144,10 @@ class Application(QWidget):
         i = 0
         for k, v in body.items():
             field_item = QTableWidgetItem(str(k))
-            val_item = QTableWidgetItem(str(v))
+            if isinstance(v, bytes):
+                val_item = QTableWidgetItem(str(bytes.decode(v)))
+            else:
+                val_item = QTableWidgetItem(str(v))
             self.record_content_table.setItem(i, 0, field_item)
             self.record_content_table.setItem(i, 2, val_item)
             print(str(k) + ": " + str(v))
@@ -135,14 +162,14 @@ class Application(QWidget):
             pass
         else:
             if len(filepath[0]) == 1:
-                filename = filepath[0][0]
-                if filename.endswith(".std") or filename.endswith(".stdf"):
-                    f = open(filename, 'rb')
-                elif filename.endswith(".gz"):
-                    f = gzip.open(filename, 'rb')
+                self.filename = filepath[0][0]
+                # if filename.endswith(".std") or filename.endswith(".stdf"):
+                #     f = open(filename, 'rb')
+                # elif filename.endswith(".gz"):
+                #     f = gzip.open(filename, 'rb')
 
                 self.stdf = Reader()
-                self.stdf.load_stdf_file(stdf_file=filename)
+                self.stdf.load_stdf_file(stdf_file=self.filename)
                 self.stdf_dic = self.get_all_records(self.stdf)
                 self.show_table()
             else:

@@ -28,7 +28,7 @@ class Writer:
         self.FMT_MAP = {}
         self.load_fmt_mapping()
 
-        self.e = '<'
+        self.e = '>'
 
         self.load_stdf_type(stdf_type_json)
 
