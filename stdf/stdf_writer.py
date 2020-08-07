@@ -157,7 +157,7 @@ class Writer:
 
             if fmt_raw.startswith('K'):
                 mo = re.match('^K([0xn])(\w{2})', fmt_raw)
-                n = self.__get_multiplier(field_name, body_data)
+                n = self.__get_multiplier(field_name, field_data)
                 fmt_act = mo.group(2)
 
                 for i in range(n):

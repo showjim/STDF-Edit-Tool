@@ -45,7 +45,7 @@ class Application(QWidget):
         self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
         self.show_previous_record.clicked.connect(self.show_previous_content_table)
 
-        row_num = 0 #len(self.stdf_dic)
+        row_num = 0  # len(self.stdf_dic)
         col_num = 4
 
         self.table.setRowCount(row_num)
@@ -88,17 +88,19 @@ class Application(QWidget):
             else:
                 if 'U' in tmp_type or 'I' in tmp_type or 'B' in tmp_type or 'N' in tmp_type:
                     if 'K' in tmp_type:
-                        data[tmp_field] = list(map(int, tmp_val.replace('[','').replace(']','').replace(' ','').split(',')))
+                        data[tmp_field] = list(
+                            map(int, tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')))
                     else:
                         data[tmp_field] = int(tmp_val)
                 elif 'R' in tmp_type:
                     if 'K' in tmp_type:
-                        data[tmp_field] = list(map(float, tmp_val.replace('[','').replace(']','').replace(' ','').split(',')))
+                        data[tmp_field] = list(
+                            map(float, tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')))
                     else:
                         data[tmp_field] = float(tmp_val)
                 elif 'C' in tmp_type:
                     if 'K' in tmp_type:
-                        data[tmp_field] = tmp_val.replace('[','').replace(']','').replace(' ','').split(',')
+                        data[tmp_field] = tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')
                     else:
                         data[tmp_field] = str(tmp_val)
         # tmp = self.w.pack_record('FAR', data)
