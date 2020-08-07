@@ -113,7 +113,13 @@ class Reader:
             body_raw = self._read_body(rec_size)
             rec_name, body = self._unpack_body(header, body_raw)
             self.log.debug('BODY end at tell={:0>8}'.format(self.STDF_IO.tell()))
-
+            if len(body) < len(self.STDF_TYPE[rec_name]['body']):
+                for field, val in self.STDF_TYPE[rec_name]['body']:
+                    if field in body:
+                        pass
+                    else:
+                        body[field] = 'N/A'
+                pass
             # if rec_name == 'FAR':
             #     self.__set_endian(body['CPU_TYPE'])
 

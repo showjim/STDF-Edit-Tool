@@ -83,7 +83,24 @@ class Application(QWidget):
             tmp_field = self.record_content_table.item(row, 0).text()
             tmp_type = self.record_content_table.item(row, 1).text()
             tmp_val = self.record_content_table.item(row, 2).text()
-            data[tmp_field] = int(tmp_val)
+            if tmp_val == 'N/A':
+                data[tmp_field] = None
+            else:
+                if 'U' in tmp_type or 'I' in tmp_type or 'B' in tmp_type or 'N' in tmp_type:
+                    if 'K' in tmp_type:
+                        data[tmp_field] = list(map(int, tmp_val.replace('[','').replace(']','').replace(' ','').split(',')))
+                    else:
+                        data[tmp_field] = int(tmp_val)
+                elif 'R' in tmp_type:
+                    if 'K' in tmp_type:
+                        data[tmp_field] = list(map(float, tmp_val.replace('[','').replace(']','').replace(' ','').split(',')))
+                    else:
+                        data[tmp_field] = float(tmp_val)
+                elif 'C' in tmp_type:
+                    if 'K' in tmp_type:
+                        data[tmp_field] = tmp_val.replace('[','').replace(']','').replace(' ','').split(',')
+                    else:
+                        data[tmp_field] = str(tmp_val)
         # tmp = self.w.pack_record('FAR', data)
         # self.stdf.STDF_IO.seek(self.position)
         # self.stdf.STDF_IO.write(tmp)

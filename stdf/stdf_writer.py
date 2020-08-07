@@ -127,10 +127,13 @@ class Writer:
         dat_ret = []
 
         if fmt_raw == 'Cn':
-            string, length = item
-            fmt_ret += 'B' + str(length) + 's'
-            dat_ret.append(length)
-            dat_ret.append(string.encode())
+            # string, length = item
+            if item is not None:
+                string = item
+                length = len(item)
+                fmt_ret += 'B' + str(length) + 's'
+                dat_ret.append(length)
+                dat_ret.append(string.encode())
 
         elif fmt_raw == 'Bn':
             length = len(item)
