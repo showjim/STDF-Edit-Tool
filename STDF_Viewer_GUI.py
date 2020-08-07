@@ -18,6 +18,8 @@ class Application(QWidget):
         self.index_in_same_record = 0
         self.current_row = 0
         self.w = Writer(r'./stdf/stdf_v4.json')
+        self.position = 0
+        self.rec_name = ''
 
     def setupUI(self):
         # 设置标题与初始大小
@@ -72,20 +74,21 @@ class Application(QWidget):
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        self.table.cellDoubleClicked.connect(self.show_content_table)
+        self.table.cellClicked.connect(self.show_content_table)
         # self.record_content_table.itemChanged.connect(self.modify_content_table)
 
     def modify_content_table(self):
         data = {}
         for row in range(self.record_content_table.rowCount()):
             tmp_field = self.record_content_table.item(row, 0).text()
+            tmp_type = self.record_content_table.item(row, 1).text()
             tmp_val = self.record_content_table.item(row, 2).text()
             data[tmp_field] = int(tmp_val)
         # tmp = self.w.pack_record('FAR', data)
         # self.stdf.STDF_IO.seek(self.position)
         # self.stdf.STDF_IO.write(tmp)
         with open(self.filename, mode='rb+') as fout:
-            tmp = self.w.pack_record('FAR', data)
+            tmp = self.w.pack_record(self.rec_name, data)
             fout.seek(self.position)
             fout.write(tmp)
             fout.flush()
@@ -135,7 +138,7 @@ class Application(QWidget):
             index = 0
         self.position = self.stdf_dic[key][index]
         self.stdf.STDF_IO.seek(self.position)
-        rec_name, header, body = self.stdf.read_record()
+        self.rec_name, header, body = self.stdf.read_record()
         # Refresh the content table
         self.record_content_table.setRowCount(len(body))
         self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
@@ -144,11 +147,13 @@ class Application(QWidget):
         i = 0
         for k, v in body.items():
             field_item = QTableWidgetItem(str(k))
+            type_item = QTableWidgetItem(self.stdf.STDF_TYPE[self.rec_name]['body'][i][1])
             if isinstance(v, bytes):
                 val_item = QTableWidgetItem(str(bytes.decode(v)))
             else:
                 val_item = QTableWidgetItem(str(v))
             self.record_content_table.setItem(i, 0, field_item)
+            self.record_content_table.setItem(i, 1, type_item)
             self.record_content_table.setItem(i, 2, val_item)
             print(str(k) + ": " + str(v))
             i += 1
