@@ -20,6 +20,7 @@ class Application(QWidget):
         self.w = Writer(r'./stdf/stdf_v4.json')
         self.position = 0
         self.rec_name = ''
+        self.e = ''
 
     def setupUI(self):
         # 设置标题与初始大小
@@ -106,11 +107,13 @@ class Application(QWidget):
         # tmp = self.w.pack_record('FAR', data)
         # self.stdf.STDF_IO.seek(self.position)
         # self.stdf.STDF_IO.write(tmp)
+        # set the endian
+        self.w.e = self.e
         with open(self.filename, mode='rb+') as fout:
             tmp = self.w.pack_record(self.rec_name, data)
             fout.seek(self.position)
             fout.write(tmp)
-            fout.flush()
+            # fout.flush()
 
     def show_table(self):
         row_num = len(self.stdf_dic)
@@ -220,6 +223,7 @@ class Application(QWidget):
             i += 1
             last_rec = rec_name
         stdf.read_rec_list = False
+        self.e = stdf.e
         return stdf_dic
 
 
