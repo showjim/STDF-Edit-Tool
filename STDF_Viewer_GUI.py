@@ -23,7 +23,7 @@ class Application(QWidget):
         self.e = ''
 
     def setupUI(self):
-        # 设置标题与初始大小
+        # Title and window size
         self.setWindowTitle('STDF Viewer Beta V0.1')
         self.resize(1000, 600)
 
@@ -57,7 +57,7 @@ class Application(QWidget):
         self.record_content_table.setColumnCount(3)
         self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
 
-        # 设置布局
+        # Config layout
         layout = QGridLayout()
         layout.addWidget(self.load_stdf_button, 0, 0, 1, 1)
         layout.addWidget(self.save_stdf_button, 0, 1, 1, 1)
@@ -74,9 +74,7 @@ class Application(QWidget):
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
         self.table.cellClicked.connect(self.show_content_table)
-        # self.record_content_table.itemChanged.connect(self.modify_content_table)
 
     def modify_content_table(self):
         data = {}

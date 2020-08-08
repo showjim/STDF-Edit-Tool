@@ -113,6 +113,7 @@ class Reader:
             body_raw = self._read_body(rec_size)
             rec_name, body = self._unpack_body(header, body_raw)
             self.log.debug('BODY end at tell={:0>8}'.format(self.STDF_IO.tell()))
+            # To show all the fields
             if len(body) < len(self.STDF_TYPE[rec_name]['body']):
                 for field, val in self.STDF_TYPE[rec_name]['body']:
                     if field in body:
