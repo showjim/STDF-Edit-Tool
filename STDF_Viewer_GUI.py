@@ -170,10 +170,21 @@ class Application(QWidget):
         for k, v in body.items():
             field_item = QTableWidgetItem(str(k))
             type_item = QTableWidgetItem(self.stdf.STDF_TYPE[self.rec_name]['body'][i][1])
-            if isinstance(v, bytes):
-                val_item = QTableWidgetItem(str(bytes.decode(v)))
+            if isinstance(v, list):
+                tmp_list = []
+                for tmp_v in v:
+                    if isinstance(tmp_v, bytes):
+                        tmp_list.append(str(bytes.decode(tmp_v)))
+                        # val_item = QTableWidgetItem(str(bytes.decode(tmp_v)))
+                    else:
+                        tmp_list.append(str(tmp_v))
+                        # val_item = QTableWidgetItem(str(tmp_v))
+                val_item = QTableWidgetItem(','.join(tmp_list))
             else:
-                val_item = QTableWidgetItem(str(v))
+                if isinstance(v, bytes):
+                    val_item = QTableWidgetItem(str(bytes.decode(v)))
+                else:
+                    val_item = QTableWidgetItem(str(v))
             self.record_content_table.setItem(i, 0, field_item)
             self.record_content_table.setItem(i, 1, type_item)
             self.record_content_table.setItem(i, 2, val_item)
