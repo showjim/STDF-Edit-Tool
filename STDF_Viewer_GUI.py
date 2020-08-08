@@ -179,7 +179,7 @@ class Application(QWidget):
                     else:
                         tmp_list.append(str(tmp_v))
                         # val_item = QTableWidgetItem(str(tmp_v))
-                val_item = QTableWidgetItem(','.join(tmp_list))
+                val_item = QTableWidgetItem('[' + ', '.join(tmp_list) + ']')
             else:
                 if isinstance(v, bytes):
                     val_item = QTableWidgetItem(str(bytes.decode(v)))
