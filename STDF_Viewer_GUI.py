@@ -82,7 +82,7 @@ class Application(QWidget):
             tmp_field = self.record_content_table.item(row, 0).text()
             tmp_type = self.record_content_table.item(row, 1).text()
             tmp_val = self.record_content_table.item(row, 2).text()
-            if tmp_val == 'N/A':
+            if tmp_val == 'N/A': # or tmp_val == ' ': # or tmp_val == '':
                 data[tmp_field] = None
             else:
                 if 'U' in tmp_type or 'I' in tmp_type or 'B' in tmp_type or 'N' in tmp_type:

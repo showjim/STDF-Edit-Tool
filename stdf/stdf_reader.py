@@ -206,7 +206,7 @@ class Reader:
         return rec_name, body
 
     def __get_data(self, fmt_act, body_raw, odd_nibble):
-        data = 0
+        data = '' #0
         if fmt_act == 'N1':
             if odd_nibble:
                 nibble, = struct.unpack(self.e + 'B', body_raw.read(1))

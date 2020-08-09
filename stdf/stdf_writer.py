@@ -126,24 +126,29 @@ class Writer:
         fmt_ret = ''
         dat_ret = []
 
-        if fmt_raw == 'Cn':
-            # string, length = item
-            if item is not None:
+        if item is not None:
+            if fmt_raw == 'Cn':
+                # string, length = item
                 string = item
                 length = len(item)
                 fmt_ret += 'B' + str(length) + 's'
                 dat_ret.append(length)
                 dat_ret.append(string.encode())
 
-        elif fmt_raw == 'Bn':
-            length = len(item)
-            fmt_ret += 'B' + str(length) + 'B'
-            dat_ret.append(length)
-            dat_ret.extend(item)
+            elif fmt_raw == 'Bn':
+                length = len(item)
+                fmt_ret += 'B' + str(length) + 'B'
+                dat_ret.append(length)
+                dat_ret.extend(item)
 
-        else:
-            fmt_ret += self.FMT_MAP[fmt_raw]
-            dat_ret.append(item)
+            elif fmt_raw == 'C1':
+                string = item
+                fmt_ret += self.FMT_MAP[fmt_raw]
+                dat_ret.append(string.encode())
+
+            else:
+                fmt_ret += self.FMT_MAP[fmt_raw]
+                dat_ret.append(item)
 
         return fmt_ret, dat_ret
 
