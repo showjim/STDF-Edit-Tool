@@ -107,11 +107,25 @@ class Application(QWidget):
         # self.stdf.STDF_IO.write(tmp)
         # set the endian
         self.w.e = self.e
-        with open(self.filename, mode='rb+') as fout:
+        # # This is to overwrite the bytes with same length
+        # with open(self.filename, mode='rb+') as fout:
+        #     tmp = self.w.pack_record(self.rec_name, data)
+        #     fout.seek(self.position)
+        #     fout.write(tmp)
+        #     # fout.flush()
+
+        # This is to insert bytes into file
+        with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.stdf', 'wb') as new_buffer:
+            # copy until nth byte
+            if self.position > 1:
+                tmp = old_buffer.read(self.position)
+                new_buffer.write(tmp)
+            # insert new content
             tmp = self.w.pack_record(self.rec_name, data)
-            fout.seek(self.position)
-            fout.write(tmp)
-            # fout.flush()
+            new_buffer.write(tmp)
+            # copy the rest of the file
+            tmp = old_buffer.read()
+            new_buffer.write(tmp)
 
     def show_table(self):
         row_num = len(self.stdf_dic)
