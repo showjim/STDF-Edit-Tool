@@ -38,13 +38,19 @@ class Application(QWidget):
         # Button show next record
         self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
         self.show_next_record.clicked.connect(self.show_next_content_table)
-        # Update modification button
-        self.update_mod_record = QPushButton(qta.icon('mdi.arrow-up-bold-box-outline', color='green'), '')
-        self.update_mod_record.clicked.connect(self.modify_content_table)
-
         # Button show previous record
         self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
         self.show_previous_record.clicked.connect(self.show_previous_content_table)
+        # Update modification button
+        self.update_mod_record = QPushButton(qta.icon('mdi.arrow-up-bold-box-outline', color='green'), '')
+        self.update_mod_record.clicked.connect(self.modify_content_table)
+        # increase record button
+        self.increase_record = QPushButton(qta.icon('fa.plus-square', color='green'), '')
+        self.increase_record.clicked.connect(self.modify_content_table)
+        # delete record button
+        self.delete_record = QPushButton(qta.icon('fa.minus-square', color='red'), '')
+        self.delete_record.clicked.connect(self.modify_content_table)
+
 
         row_num = 0  # len(self.stdf_dic)
         col_num = 4
@@ -62,6 +68,8 @@ class Application(QWidget):
         layout.addWidget(self.load_stdf_button, 0, 0, 1, 1)
         layout.addWidget(self.save_stdf_button, 0, 1, 1, 1)
         layout.addWidget(self.update_mod_record, 0, 2, 1, 1)
+        layout.addWidget(self.increase_record, 0, 3, 1, 1)
+        layout.addWidget(self.delete_record, 0, 4, 1, 1)
         layout.addWidget(self.table, 1, 0, 32, 18)
         # layout2 = QGridLayout()
         layout.addWidget(self.show_previous_record, 1, 19, 1, 1)
