@@ -24,7 +24,7 @@ class Application(QWidget):
 
     def setupUI(self):
         # Title and window size
-        self.setWindowTitle('STDF Viewer Beta V0.1')
+        self.setWindowTitle('STDF Viewer Beta V0.2')
         self.resize(1000, 600)
 
         self.table = QTableWidget(self)
