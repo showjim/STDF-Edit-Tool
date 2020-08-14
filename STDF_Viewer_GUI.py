@@ -227,7 +227,7 @@ class Application(QWidget):
                 self.stdf.load_stdf_file(stdf_file=self.filename)
                 self.stdf_dic = self.get_all_records(self.stdf)
                 self.show_table()
-                self.setWindowTitle(version + ' - ' + self.filename)
+                self.setWindowTitle(version + ' - ' + self.filename.split(r'/')[-1])
             else:
                 pass
 
