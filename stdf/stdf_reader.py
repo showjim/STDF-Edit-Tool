@@ -22,6 +22,7 @@ import logging
 import re
 import math
 from os import path
+import gzip
 
 __author__ = 'cahyo primawidodo 2016'
 
@@ -79,9 +80,13 @@ class Reader:
 
     def load_stdf_file(self, stdf_file):
         self.log.info('opening STDF file = {}'.format(stdf_file))
-        with open(stdf_file, mode='r+b') as fs:
-            # self.fs = io.BytesIO(fs.write())
-            self.STDF_IO = io.BytesIO(fs.read())
+        if stdf_file.endswith(".std") or stdf_file.endswith(".stdf"):
+            with open(stdf_file, mode='rb') as fs:
+                self.STDF_IO = io.BytesIO(fs.read())
+        elif stdf_file.endswith(".gz"):
+            with gzip.open(stdf_file, mode='rb') as fs:
+                self.STDF_IO = io.BytesIO(fs.read())
+
         self.log.info('detecting STDF file size = {}'.format(len(self.STDF_IO.getvalue())))
 
     def auto_detect_endian(self):

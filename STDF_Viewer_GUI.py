@@ -8,7 +8,8 @@ from stdf.stdf_writer import Writer
 import logging
 import qtawesome as qta
 import time
-import gzip
+
+version = 'STDF Viewer Beta V0.2'
 
 
 class Application(QWidget):
@@ -24,7 +25,7 @@ class Application(QWidget):
 
     def setupUI(self):
         # Title and window size
-        self.setWindowTitle('STDF Viewer Beta V0.2')
+        self.setWindowTitle(version)
         self.resize(1000, 600)
 
         self.table = QTableWidget(self)
@@ -213,23 +214,20 @@ class Application(QWidget):
 
     def load_stdf(self):
         filterboi = 'STDF (*.stdf *.std);;GZ (*.stdf.gz *.std.gz)'
-        filepath = QFileDialog.getOpenFileNames(
+        filepath = QFileDialog.getOpenFileName(
             caption='Open STDF or GZ File', filter=filterboi)
         # Open std file/s
         if len(filepath[0]) == 0:
             pass
         else:
-            if len(filepath[0]) == 1:
-                self.filename = filepath[0][0]
-                # if filename.endswith(".std") or filename.endswith(".stdf"):
-                #     f = open(filename, 'rb')
-                # elif filename.endswith(".gz"):
-                #     f = gzip.open(filename, 'rb')
+            if len(filepath[0]) > 1:
+                self.filename = filepath[0]
 
                 self.stdf = Reader()
                 self.stdf.load_stdf_file(stdf_file=self.filename)
                 self.stdf_dic = self.get_all_records(self.stdf)
                 self.show_table()
+                self.setWindowTitle(version + ' - ' + self.filename)
             else:
                 pass
 
