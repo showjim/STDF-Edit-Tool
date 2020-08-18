@@ -27,7 +27,7 @@ class Application(QWidget):
         self.setupUI()
         self.index_in_same_record = 0
         self.current_row = 0
-        self.w = Writer('')
+        self.w = Writer()
         self.position = 0
         self.rec_name = ''
         self.e = ''

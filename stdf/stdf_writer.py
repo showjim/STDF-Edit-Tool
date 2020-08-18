@@ -22,7 +22,7 @@ from stdf.stdf_type_V4_2007_1 import TYPE
 
 class Writer:
 
-    def __init__(self, stdf_type_json='stdf_v4.json'):
+    def __init__(self):
         self.STDF_TYPE = {}
         self.REC_NAME = {}
         self.FMT_MAP = {}
@@ -30,9 +30,9 @@ class Writer:
 
         self.e = '<'
 
-        self.load_stdf_type(stdf_type_json)
+        self.load_stdf_type()
 
-    def load_stdf_type(self, json_file):
+    def load_stdf_type(self):
         # with open(json_file) as fp:
         #     self.STDF_TYPE = json.load(fp)
         self.STDF_TYPE = TYPE

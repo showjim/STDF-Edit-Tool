@@ -30,7 +30,7 @@ from stdf.stdf_type_V4_2007_1 import TYPE
 class Reader:
     HEADER_SIZE = 4
 
-    def __init__(self, stdf_ver_json=None):
+    def __init__(self):
         self.log = logging.getLogger(self.__class__.__name__)
         self.STDF_TYPE = {}
         self.STDF_IO = io.BytesIO(b'')
@@ -41,11 +41,11 @@ class Reader:
         self.body_start = 0
 
         self._load_byte_fmt_mapping()
-        self._load_stdf_type(json_file=stdf_ver_json)
+        self._load_stdf_type()
 
         self.read_rec_list = False
 
-    def _load_stdf_type(self, json_file):
+    def _load_stdf_type(self):
 
         # if json_file is None:
         #     here = path.abspath(path.dirname(__file__))
