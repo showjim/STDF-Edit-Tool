@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 """The MIT License (MIT)
 Copyright (c) 2016 Cahyo Primawidodo
 
@@ -207,8 +208,10 @@ class Writer:
                 fmt_act = mo.group(2)
 
                 for i in range(n):
-
-                    fmt, dat, odd_nibble = self.__construct_body(fmt_act, item[i], body_data, odd_nibble)
+                    if item is None:
+                        fmt, dat, odd_nibble = self.__construct_body(fmt_act, item, body_data, odd_nibble)
+                    else:
+                        fmt, dat, odd_nibble = self.__construct_body(fmt_act, item[i], body_data, odd_nibble)
 
                     body_fmt += fmt
                     body_data.extend(dat)

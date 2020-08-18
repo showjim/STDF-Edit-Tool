@@ -61,9 +61,9 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                 'rec_sub': 90,
                 'body': [['CONT_FLG', 'B1'], ['PSR_INDX', 'U2'], ['PSR_NAM', 'Cn'], ['OPT_FLG', 'B1'],
                          ['TOTP_CNT', 'U2'], ['LOCP_CNT', 'U2'], ['PAT_BGN', 'K0U8'], ['PAT_END', 'K0U8'],
-                         ['PAT_FILE', 'K0Cn'], ['PAT_LBL', 'K0Cn'],
+                         ['PAT_FILE', 'K0Cn'], ['PAT_LBL', 'K0Cn']
                          # Disable these 3 items for I do not know how to handle them in stdf, seems like random ASCII char.
-                         ['FILE_UID', 'K0Cn'], ['ATPG_DSC', 'K0Cn'], ['SRC_ID', 'K0Cn']
+                         # ['FILE_UID', 'K0Cn'], ['ATPG_DSC', 'K0Cn'], ['SRC_ID', 'K0Cn']
                          ]
                 },
         'NMR': {'rec_typ': 1,
