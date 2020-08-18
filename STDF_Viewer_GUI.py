@@ -1,4 +1,11 @@
 # -*- coding:utf-8 -*-
+###################################################
+# STDF Viewer Tool                                #
+# Version: Beta 0.2                               #
+#                                                 #
+# Aug. 18, 2020                                   #
+# A light STDF Viewer and edit tool               #
+###################################################
 import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -10,7 +17,8 @@ import qtawesome as qta
 import time
 import gzip
 
-version = 'STDF Viewer Beta V0.2'
+__version__ = 'STDF Viewer Beta V0.2'
+__author__ = 'zhouchao486@gmail.com'
 
 
 class Application(QWidget):
@@ -19,14 +27,14 @@ class Application(QWidget):
         self.setupUI()
         self.index_in_same_record = 0
         self.current_row = 0
-        self.w = Writer(r'./stdf/stdf_v4.json')
+        self.w = Writer('')
         self.position = 0
         self.rec_name = ''
         self.e = ''
 
     def setupUI(self):
         # Title and window size
-        self.setWindowTitle(version)
+        self.setWindowTitle(__version__)
         self.resize(1000, 600)
 
         self.table = QTableWidget(self)
@@ -241,7 +249,7 @@ class Application(QWidget):
                 self.stdf.load_stdf_file(stdf_file=self.filename)
                 self.stdf_dic = self.get_all_records(self.stdf)
                 self.show_table()
-                self.setWindowTitle(version + ' - ' + self.filename.split(r'/')[-1])
+                self.setWindowTitle(__version__ + ' - ' + self.filename.split(r'/')[-1])
             else:
                 pass
 

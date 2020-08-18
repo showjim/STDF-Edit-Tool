@@ -26,8 +26,6 @@ from os import path
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
-__author__ = 'cahyo primawidodo 2016'
-
 
 class Reader:
     HEADER_SIZE = 4

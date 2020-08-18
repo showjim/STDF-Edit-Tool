@@ -17,7 +17,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 THE SOFTWARE."""
 
 import struct
-import json
 import re
 from stdf.stdf_type_V4_2007_1 import TYPE
 
