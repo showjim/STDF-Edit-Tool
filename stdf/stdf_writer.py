@@ -18,7 +18,7 @@ THE SOFTWARE."""
 import struct
 import json
 import re
-
+from stdf.stdf_type_V4_2007_1 import TYPE
 
 class Writer:
 
@@ -33,8 +33,9 @@ class Writer:
         self.load_stdf_type(stdf_type_json)
 
     def load_stdf_type(self, json_file):
-        with open(json_file) as fp:
-            self.STDF_TYPE = json.load(fp)
+        # with open(json_file) as fp:
+        #     self.STDF_TYPE = json.load(fp)
+        self.STDF_TYPE = TYPE
 
         for k, v in self.STDF_TYPE.items():
             typ_sub = (v['rec_typ'], v['rec_sub'])
@@ -42,23 +43,21 @@ class Writer:
 
     def load_fmt_mapping(self, json_file=None):
 
-        if json_file is None:
-            self.FMT_MAP = {
-                "U1": "B",
-                "U2": "H",
-                "U4": "I",
-                "I1": "b",
-                "I2": "h",
-                "I4": "i",
-                "R4": "f",
-                "R8": "d",
-                "B1": "B",
-                "C1": "c",
-                "N1": "B"
-            }
-        else:
-            with open(json_file) as fp:
-                self.FMT_MAP = json.load(fp)
+        self.FMT_MAP = {
+            "U1": "B",
+            "U2": "H",
+            "U4": "I",
+            "U8": "Q",
+            "I1": "b",
+            "I2": "h",
+            "I4": "i",
+            "I8": "q",
+            "R4": "f",
+            "R8": "d",
+            "B1": "B",
+            "C1": "c",
+            "N1": "B"
+        }
 
     @staticmethod
     def __get_multiplier(field, body):
