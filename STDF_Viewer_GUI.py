@@ -139,7 +139,7 @@ class Application(QWidget):
 
         # This is to modify/insert bytes into file
         if self.filename.endswith(".std") or self.filename.endswith(".stdf"):
-            with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.stdf', 'wb') as new_buffer:
+            with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.std', 'wb') as new_buffer:
                 # copy until nth byte
                 if self.position > 1:
                     tmp = old_buffer.read(self.position)
