@@ -4,7 +4,7 @@
 # Version: Beta 0.2                               #
 #                                                 #
 # Aug. 18, 2020                                   #
-# A light STDF Viewer and edit tool               #
+# A light STDF viewer and editor Tool               #
 ###################################################
 import sys
 from PyQt5.QtCore import *
