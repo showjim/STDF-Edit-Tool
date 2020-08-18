@@ -103,18 +103,23 @@ class Application(QWidget):
             if tmp_val == 'N/A': # or tmp_val == ' ': # or tmp_val == '':
                 data[tmp_field] = None
             else:
+                # long/intger data
                 if 'U' in tmp_type or 'I' in tmp_type or 'B' in tmp_type or 'N' in tmp_type:
+                    # list data
                     if 'K' in tmp_type:
                         data[tmp_field] = list(
                             map(int, tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')))
                     else:
                         data[tmp_field] = int(tmp_val)
+                # double data
                 elif 'R' in tmp_type:
+                    # list data
                     if 'K' in tmp_type:
                         data[tmp_field] = list(
                             map(float, tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')))
                     else:
                         data[tmp_field] = float(tmp_val)
+                # string data
                 elif 'C' in tmp_type:
                     if 'K' in tmp_type:
                         data[tmp_field] = tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')
@@ -158,6 +163,7 @@ class Application(QWidget):
                 tmp = old_buffer.read()
                 new_buffer.write(tmp)
 
+    # To show records in stdf file
     def show_table(self):
         row_num = len(self.stdf_dic)
         col_num = 4
@@ -194,6 +200,7 @@ class Application(QWidget):
         self.index_in_same_record -= 1
         self.show_record(self.current_row, 0, self.index_in_same_record)
 
+    # To show fields & data in record
     def show_record(self, row, col, index):
         # Get cell text
         self.current_row = row
@@ -256,6 +263,7 @@ class Application(QWidget):
     def save_stdf(self):
         pass
 
+    # Get the records list in stdf file
     def get_all_records(self, stdf):
         stdf.read_rec_list = True
         stdf_dic = {}
