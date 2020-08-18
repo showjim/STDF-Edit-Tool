@@ -288,10 +288,6 @@ class Application(QWidget):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    # in_file = r'./sample_stdf/a595.stdf'
-    # stdf = Reader()
-    # stdf.load_stdf_file(stdf_file=in_file)
-    # stdf_dic = get_all_records(stdf)
 
     app = QApplication(sys.argv)
     viewer = Application()
