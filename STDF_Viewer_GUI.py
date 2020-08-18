@@ -8,6 +8,7 @@ from stdf.stdf_writer import Writer
 import logging
 import qtawesome as qta
 import time
+import gzip
 
 version = 'STDF Viewer Beta V0.2'
 
@@ -123,18 +124,31 @@ class Application(QWidget):
         #     fout.write(tmp)
         #     # fout.flush()
 
-        # This is to insert bytes into file
-        with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.stdf', 'wb') as new_buffer:
-            # copy until nth byte
-            if self.position > 1:
-                tmp = old_buffer.read(self.position)
+        # This is to modify/insert bytes into file
+        if self.filename.endswith(".std") or self.filename.endswith(".stdf"):
+            with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.stdf', 'wb') as new_buffer:
+                # copy until nth byte
+                if self.position > 1:
+                    tmp = old_buffer.read(self.position)
+                    new_buffer.write(tmp)
+                # insert new content
+                tmp = self.w.pack_record(self.rec_name, data)
                 new_buffer.write(tmp)
-            # insert new content
-            tmp = self.w.pack_record(self.rec_name, data)
-            new_buffer.write(tmp)
-            # copy the rest of the file
-            tmp = old_buffer.read()
-            new_buffer.write(tmp)
+                # copy the rest of the file
+                tmp = old_buffer.read()
+                new_buffer.write(tmp)
+        elif self.filename.endswith(".gz"):
+            with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz', 'wb') as new_buffer:
+                # copy until nth byte
+                if self.position > 1:
+                    tmp = old_buffer.read(self.position)
+                    new_buffer.write(tmp)
+                # insert new content
+                tmp = self.w.pack_record(self.rec_name, data)
+                new_buffer.write(tmp)
+                # copy the rest of the file
+                tmp = old_buffer.read()
+                new_buffer.write(tmp)
 
     def show_table(self):
         row_num = len(self.stdf_dic)
