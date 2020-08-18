@@ -60,33 +60,75 @@ class Writer:
         }
 
     @staticmethod
-    def __get_multiplier(field, body):
-        if field == 'SITE_NUM':
-            return body['SITE_CNT']  # SDR (1, 80)
+    def __get_multiplier(rec_name, field, body):
+        if rec_name == 'SDR':
+            if field == 'SITE_NUM':
+                return body['SITE_CNT']  # SDR (1, 80)
+        if rec_name == 'PGR':
+            if field == 'PMR_INDX':
+                return body['INDX_CNT']  # PGR (1, 62)
+        if rec_name == 'PLR':
+            if field in ['GRP_INDX', 'GRP_MODE', 'GRP_RADX', 'PGM_CHAR', 'RTN_CHAR', 'PGM_CHAL', 'RTN_CHAL']:
+                return body['GRP_CNT']  # PLR (1, 63)
+        if rec_name == 'FTR':
+            if field in ['RTN_INDX', 'RTN_STAT']:
+                return body['RTN_ICNT']  # FTR (15, 20)
+            elif field in ['PGM_INDX', 'PGM_STAT']:
+                return body['PGM_ICNT']  # FTR (15, 20)
+        if rec_name == 'MPR':
+            if field in ['RTN_STAT', 'RTN_INDX']:
+                return body['RTN_ICNT']  # MPR (15, 15)
 
-        elif field == 'PMR_INDX':
-            return body['INDX_CNT']  # PGR (1, 62)
-
-        elif field in ['GRP_INDX', 'GRP_MODE', 'GRP_RADX', 'PGM_CHAR', 'RTN_CHAR', 'PGM_CHAL', 'RTN_CHAL']:
-            return body['GRP_CNT']  # PLR (1, 63)
-
-        elif field in ['RTN_INDX', 'RTN_STAT']:
-            return body['RTN_ICNT']  # FTR (15, 20)
-
-        elif field in ['PGM_INDX', 'PGM_STAT']:
-            return body['PGM_ICNT']  # FTR (15, 20)
-
-        elif field in ['RTN_STAT', 'RTN_INDX']:
-            return body['RTN_ICNT']  # MPR (15, 15)
-
-        elif field in ['RTN_RSLT']:
-            return body['RSLT_CNT']  # MPR (15, 15)
-
-        elif field in ['ARR_R8', 'ARR_I2', 'ARR_U4', 'ARR_U2', 'ARR_I1', 'ARR_U1', 'ARR_ICNT', 'ARR_I4', 'ARR_R4']:
-            return body[0]
-
-        elif field in ['ARR_N1', 'ARR_Cn', 'ARR_Bn']:
-            return body[0]
+            elif field in ['RTN_RSLT']:
+                return body['RSLT_CNT']  # MPR (15, 15)
+        if rec_name == 'VUR':
+            if field in ['UPD_NAM']:
+                return body['UPD_CNT']  # VUR (0, 30)
+        if rec_name == 'PSR':
+            if field in ["PAT_BGN", "PAT_END", "PAT_FILE", "PAT_LBL", "FILE_UID", "ATPG_DSC", "SRC_ID"]:
+                return body["LOCP_CNT"]  # PSR (1, 90)
+        if rec_name == 'NMR':
+            if field in ["PMR_INDX", "ATPG_NAM"]:
+                return body["LOCM_CNT"]  # NMR (1, 91)
+        if rec_name == 'SSR':
+            if field in ["CHN_LIST"]:
+                return body["CHN_CNT"]  # SSR (1, 93)
+        if rec_name == 'CDR':
+            if field in ["M_CLKS"]:
+                return body["MSTR_CNT"]  # CDR (1, 94)
+            elif field in ["S_CLKS"]:
+                return body["SLAV_CNT"]  # CDR (1, 94)
+            elif field in ["CELL_LST"]:
+                return body["LST_CNT"]  # CDR (1, 94)
+        if rec_name == 'STR':
+            if field in ['LIM_INDX', 'LIM_SPEC']:
+                return body["LIM_CNT"]  # STR
+            elif field in ['COND_LST']:
+                return body["COND_CNT"]  # STR
+            elif field in ['CYC_OFST']:
+                return body["CYCO_CNT"]  # STR
+            elif field in ['PMR_INDX']:
+                return body["PMR_CNT"]  # STR
+            elif field in ['CHN_NUM']:
+                return body["CHN_CNT"]  # STR
+            elif field in ['EXP_DATA']:
+                return body["EXP_CNT"]  # STR
+            elif field in ['CAP_DATA']:
+                return body["CAP_CNT"]  # STR
+            elif field in ['NEW_DATA']:
+                return body["NEW_CNT"]  # STR
+            elif field in ['PAT_NUM']:
+                return body["PAT_CNT"]  # STR
+            elif field in ['BIT_POS']:
+                return body["BPOS_CNT"]  # STR
+            elif field in ['USR1']:
+                return body["USR1_CNT"]  # STR
+            elif field in ['USR2']:
+                return body["USR2_CNT"]  # STR
+            elif field in ['USR3']:
+                return body["USR3_CNT"]  # STR
+            elif field in ['USER_TXT']:
+                return body["TXT_CNT"]  # STR
 
         else:
             raise ValueError
@@ -151,7 +193,7 @@ class Writer:
 
         return fmt_ret, dat_ret
 
-    def _pack_body(self, field_fmt, field_data) -> bytearray:
+    def _pack_body(self, rec_name, field_fmt, field_data) -> bytearray:
         body_fmt = ''
         body_data = []
         odd_nibble = True
@@ -161,7 +203,7 @@ class Writer:
 
             if fmt_raw.startswith('K'):
                 mo = re.match('^K([0xn])(\w{2})', fmt_raw)
-                n = self.__get_multiplier(field_name, field_data)
+                n = self.__get_multiplier(rec_name, field_name, field_data)
                 fmt_act = mo.group(2)
 
                 for i in range(n):
@@ -188,7 +230,7 @@ class Writer:
     def pack_record(self, rec_name, data):
 
         mapping = self.STDF_TYPE[rec_name]['body']
-        fmt_b, data_b = self._pack_body(mapping, data)
+        fmt_b, data_b = self._pack_body(rec_name, mapping, data)
 
         rec_len = struct.calcsize('HBB' + fmt_b) - 4
         rec_typ = self.STDF_TYPE[rec_name]['rec_typ']

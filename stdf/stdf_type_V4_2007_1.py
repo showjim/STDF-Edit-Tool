@@ -38,29 +38,37 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                          ['HAND_TYP', 'Cn'], ['HAND_ID', 'Cn'], ['CARD_TYP', 'Cn'], ['CARD_ID', 'Cn'],
                          ['LOAD_TYP', 'Cn'], ['LOAD_ID', 'Cn'], ['DIB_TYP', 'Cn'], ['DIB_ID', 'Cn'], ['CABL_TYP', 'Cn'],
                          ['CABL_ID', 'Cn'], ['CONT_TYP', 'Cn'], ['CONT_ID', 'Cn'], ['LASR_TYP', 'Cn'],
-                         ['LASR_ID', 'Cn'], ['EXTR_TYP', 'Cn'], ['EXTR_ID', 'Cn']]},
+                         ['LASR_ID', 'Cn'], ['EXTR_TYP', 'Cn'], ['EXTR_ID', 'Cn']]
+                },
         'PSR': {'rec_typ': 1, 'rec_sub': 90,
                 'body': [['CONT_FLG', 'B1'], ['PSR_INDX', 'U2'], ['PSR_NAM', 'Cn'], ['OPT_FLG', 'B1'],
                          ['TOTP_CNT', 'U2'], ['LOCP_CNT', 'U2'], ['PAT_BGN', 'K0U8'], ['PAT_END', 'K0U8'],
-                         ['PAT_FILE', 'K0Cn'], ['PAT_LBL', 'K0Cn'], ['FILE_UID', 'K0Cn'], ['ATPG_DSC', 'K0Cn'],
-                         ['SRC_ID', 'K0Cn']]},
+                         ['PAT_FILE', 'K0Cn'], ['PAT_LBL', 'K0Cn']
+                         # Disable these 3 items for I do not know how to handle them in stdf, seems like random ASCII char.
+                         #['FILE_UID', 'K0Cn'], ['ATPG_DSC', 'K0Cn'], ['SRC_ID', 'K0Cn']
+                         ]
+                },
         'NMR': {'rec_typ': 1, 'rec_sub': 91,
                 'body': [['CONT_FLG', 'B1'], ['NMR_INDX', 'U2'], ['TOTM_CNT', 'U2'], ['LOCM_CNT', 'U2'],
-                         ['PMR_INDX', 'K0U2'], ['ATPG_NAM', 'K0Cn']]},
+                         ['PMR_INDX', 'K0U2'], ['ATPG_NAM', 'K0Cn']]
+                },
         'CNR': {'rec_typ': 1, 'rec_sub': 92, 'body': [['CHN_NUM', 'U2'], ['BIT_POS', 'U4'], ['CELL_NAM', 'Sn']]},
         'SSR': {'rec_typ': 1, 'rec_sub': 93, 'body': [['SSR_NAM', 'Cn'], ['CHN_CNT', 'U2'], ['CHN_LIST', 'K0U2']]},
         'CDR': {'rec_typ': 1, 'rec_sub': 94,
                 'body': [['CONT_FLG', 'B1'], ['CDR_INDX', 'U2'], ['CHN_NAM', 'Cn'], ['CHN_LEN', 'U4'],
                          ['SIN_PIN', 'U2'], ['SOUT_PIN', 'U2'], ['MSTR_CNT', 'U1'], ['M_CLKS', 'K0U2'],
                          ['SLAV_CNT', 'U1'], ['S_CLKS', 'K0U2'], ['INV_VAL', 'U1'], ['LST_CNT', 'U2'],
-                         ['CELL_LST', 'K0Sn']]},
+                         ['CELL_LST', 'K0Sn']]
+                },
         'WIR': {'rec_typ': 2, 'rec_sub': 10,
-                'body': [['HEAD_NUM', 'U1'], ['SITE_GRP', 'U1'], ['START_T', 'U4'], ['WAFER_ID', 'Cn']]},
+                'body': [['HEAD_NUM', 'U1'], ['SITE_GRP', 'U1'], ['START_T', 'U4'], ['WAFER_ID', 'Cn']]
+                },
         'WRR': {'rec_typ': 2, 'rec_sub': 20,
                 'body': [['HEAD_NUM', 'U1'], ['SITE_GRP', 'U1'], ['FINISH_T', 'U4'], ['PART_CNT', 'U4'],
                          ['RTST_CNT', 'U4'], ['ABRT_CNT', 'U4'], ['GOOD_CNT', 'U4'], ['FUNC_CNT', 'U4'],
                          ['WAFER_ID', 'Cn'], ['FABWF_ID', 'Cn'], ['FRAME_ID', 'Cn'], ['MASK_ID', 'Cn'],
-                         ['USR_DESC', 'Cn'], ['EXC_DESC', 'Cn']]},
+                         ['USR_DESC', 'Cn'], ['EXC_DESC', 'Cn']]
+                },
         'WCR': {'rec_typ': 2, 'rec_sub': 30,
                 'body': [['WAFR_SIZ', 'R4'], ['DIE_HT', 'R4'], ['DIE_WID', 'R4'], ['WF_UNITS', 'U1'],
                          ['WF_FLAT', 'C1'], ['CENTER_X', 'I2'], ['CENTER_Y', 'I2'], ['POS_X', 'C1'], ['POS_Y', 'C1']]},
@@ -68,18 +76,21 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
         'PRR': {'rec_typ': 5, 'rec_sub': 20,
                 'body': [['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'], ['PART_FLG', 'B1'], ['NUM_TEST', 'U2'],
                          ['HARD_BIN', 'U2'], ['SOFT_BIN', 'U2'], ['X_COORD', 'I2'], ['Y_COORD', 'I2'], ['TEST_T', 'U4'],
-                         ['PART_ID', 'Cn'], ['PART_TXT', 'Cn'], ['PART_FIX', 'Bn']]},
+                         ['PART_ID', 'Cn'], ['PART_TXT', 'Cn'], ['PART_FIX', 'Bn']]
+                },
         'TSR': {'rec_typ': 10, 'rec_sub': 30,
                 'body': [['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'], ['TEST_TYP', 'C1'], ['TEST_NUM', 'U4'],
                          ['EXEC_CNT', 'U4'], ['FAIL_CNT', 'U4'], ['ALRM_CNT', 'U4'], ['TEST_NAM', 'Cn'],
                          ['SEQ_NAME', 'Cn'], ['TEST_LBL', 'Cn'], ['OPT_FLAG', 'B1'], ['TEST_TIM', 'R4'],
-                         ['TEST_MIN', 'R4'], ['TEST_MAX', 'R4'], ['TST_SUMS', 'R4'], ['TST_SQRS', 'R4']]},
+                         ['TEST_MIN', 'R4'], ['TEST_MAX', 'R4'], ['TST_SUMS', 'R4'], ['TST_SQRS', 'R4']]
+                },
         'PTR': {'rec_typ': 15, 'rec_sub': 10,
                 'body': [['TEST_NUM', 'U4'], ['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'], ['TEST_FLG', 'B1'],
                          ['PARM_FLG', 'B1'], ['RESULT', 'R4'], ['TEST_TXT', 'Cn'], ['ALARM_ID', 'Cn'],
                          ['OPT_FLAG', 'B1'], ['RES_SCAL', 'I1'], ['LLM_SCAL', 'I1'], ['HLM_SCAL', 'I1'],
                          ['LO_LIMIT', 'R4'], ['HI_LIMIT', 'R4'], ['UNITS', 'Cn'], ['C_RESFMT', 'Cn'],
-                         ['C_LLMFMT', 'Cn'], ['C_HLMFMT', 'Cn'], ['LO_SPEC', 'R4'], ['HI_SPEC', 'R4']]},
+                         ['C_LLMFMT', 'Cn'], ['C_HLMFMT', 'Cn'], ['LO_SPEC', 'R4'], ['HI_SPEC', 'R4']]
+                },
         'MPR': {'rec_typ': 15, 'rec_sub': 15,
                 'body': [['TEST_NUM', 'U4'], ['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'], ['TEST_FLG', 'B1'],
                          ['PARM_FLG', 'B1'], ['RTN_ICNT', 'U2'], ['RSLT_CNT', 'U2'], ['RTN_STAT', 'K0N1'],
@@ -87,7 +98,8 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                          ['RES_SCAL', 'I1'], ['LLM_SCAL', 'I1'], ['HLM_SCAL', 'I1'], ['LO_LIMIT', 'R4'],
                          ['HI_LIMIT', 'R4'], ['START_IN', 'R4'], ['INCR_IN', 'R4'], ['RTN_INDX', 'K0U2'],
                          ['UNITS', 'Cn'], ['UNITS_IN', 'Cn'], ['C_RESFMT', 'Cn'], ['C_LLMFMT', 'Cn'],
-                         ['C_HLMFMT', 'Cn'], ['LO_SPEC', 'R4'], ['HI_SPEC', 'R4']]},
+                         ['C_HLMFMT', 'Cn'], ['LO_SPEC', 'R4'], ['HI_SPEC', 'R4']]
+                },
         'FTR': {'rec_typ': 15, 'rec_sub': 20,
                 'body': [['TEST_NUM', 'U4'], ['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'], ['TEST_FLG', 'B1'],
                          ['OPT_FLAG', 'B1'], ['CYCL_CNT', 'U4'], ['REL_VADR', 'U4'], ['REPT_CNT', 'U4'],
@@ -95,7 +107,8 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                          ['RTN_ICNT', 'U2'], ['PGM_ICNT', 'U2'], ['RTN_INDX', 'K0U2'], ['RTN_STAT', 'K0N1'],
                          ['PGM_INDX', 'K0U2'], ['PGM_STAT', 'K0N1'], ['FAIL_PIN', 'Dn'], ['VECT_NAM', 'Cn'],
                          ['TIME_SET', 'Cn'], ['OP_CODE', 'Cn'], ['TEST_TXT', 'Cn'], ['ALARM_ID', 'Cn'],
-                         ['PROG_TXT', 'Cn'], ['RSLT_TXT', 'Cn'], ['PATG_NUM', 'U1'], ['SPIN_MAP', 'Dn']]},
+                         ['PROG_TXT', 'Cn'], ['RSLT_TXT', 'Cn'], ['PATG_NUM', 'U1'], ['SPIN_MAP', 'Dn']]
+                },
         'STR': {'rec_typ': 15, 'rec_sub': 30,
                 'body': [['CONT_FLG', 'B1'], ['TEST_NUM', 'U4'], ['HEAD_NUM', 'U1'], ['SITE_NUM', 'U1'],
                          ['PSR_REF', 'U2'], ['TEST_FLG', 'B1'], ['LOG_TYP', 'Cn'], ['TEST_TXT', 'Cn'],
@@ -111,7 +124,9 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                          ['NEW_CNT', 'U2'], ['NEW_DATA', 'K0U1'], ['PAT_CNT', 'U2'], ['PAT_NUM', 'K0U1'],
                          ['BPOS_CNT', 'U2'], ['BIT_POS', 'K0U1'], ['USR1_CNT', 'U2'], ['USR1', 'K0U1'],
                          ['USR2_CNT', 'U2'], ['USR2', 'K0U1'], ['USR3_CNT', 'U2'], ['USR3', 'K0U1'], ['TXT_CNT', 'U2'],
-                         ['USER_TXT', 'K0U1']]}, 'BPS': {'rec_typ': 20, 'rec_sub': 10, 'body': [['SEQ_NAME', 'Cn']]},
+                         ['USER_TXT', 'K0U1']]
+                },
+        'BPS': {'rec_typ': 20, 'rec_sub': 10, 'body': [['SEQ_NAME', 'Cn']]},
         'EPS': {'rec_typ': 20, 'rec_sub': 20, 'body': []},
         'GDR': {'rec_typ': 50, 'rec_sub': 10, 'body': [['GEN_DATA', 'Vn']]},
         'DTR': {'rec_typ': 50, 'rec_sub': 30, 'body': [['TEXT_DAT', 'Cn']]}}
