@@ -60,7 +60,7 @@ class Application(QWidget):
         # delete record button
         self.delete_record = QPushButton(qta.icon('fa.minus-square', color='red'), '')
         self.delete_record.clicked.connect(self.modify_content_table)
-
+        self.page_index = QComboBox()
 
         row_num = 0  # len(self.stdf_dic)
         col_num = 4
@@ -83,7 +83,8 @@ class Application(QWidget):
         layout.addWidget(self.table, 1, 0, 32, 18)
         # layout2 = QGridLayout()
         layout.addWidget(self.show_previous_record, 1, 19, 1, 1)
-        layout.addWidget(self.show_next_record, 1, 20, 1, 1)
+        layout.addWidget(self.page_index, 1, 20, 1, 1)
+        layout.addWidget(self.show_next_record, 1, 21, 1, 1)
         # self.record_content_table.setLayout(layout2)
         layout.addWidget(self.record_content_table, 2, 19, 31, 12)
         # layout.addWidget(self.record_content_table)
@@ -190,14 +191,27 @@ class Application(QWidget):
 
     def show_content_table(self, row, col):
         self.index_in_same_record = 0
+        page_count = int(self.table.item(row, 2).text())
+        # Set the record page combo
+        self.page_list = []
+        for i in range(0, page_count):
+            self.page_list.append(str(i))
+        self.page_index.clear()
+        self.page_index.addItems(self.page_list)
         self.show_record(row, col, self.index_in_same_record)
 
     def show_next_content_table(self):
-        self.index_in_same_record += 1
+        self.index_in_same_record = int(self.page_index.currentText()) + 1
+        if self.index_in_same_record > len(self.page_list) - 1:
+            self.index_in_same_record = len(self.page_list) - 1
+        self.page_index.setCurrentIndex(self.index_in_same_record)
         self.show_record(self.current_row, 0, self.index_in_same_record)
 
     def show_previous_content_table(self):
-        self.index_in_same_record -= 1
+        self.index_in_same_record = int(self.page_index.currentText()) - 1
+        if self.index_in_same_record < 0:
+            self.index_in_same_record = 0
+        self.page_index.setCurrentIndex(self.index_in_same_record)
         self.show_record(self.current_row, 0, self.index_in_same_record)
 
     # To show fields & data in record
@@ -205,6 +219,7 @@ class Application(QWidget):
         # Get cell text
         self.current_row = row
         key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
+
         # Enable STDF record read procedure
         if index < 0 or index > len(self.stdf_dic[key]) - 1:
             index = 0
