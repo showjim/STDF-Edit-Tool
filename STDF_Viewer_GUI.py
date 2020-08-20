@@ -37,8 +37,8 @@ class Application(QWidget):
         self.setWindowTitle(__version__)
         self.resize(1000, 600)
 
-        self.table = QTableWidget(self)
-        self.record_content_table = QTableWidget(self)
+        self.table = TableWidget(self)
+        self.record_content_table = TableWidget(self)
         # Load STDF
         self.load_stdf_button = QPushButton(qta.icon('mdi.folder-open', color='blue'), '')
         self.load_stdf_button.clicked.connect(self.load_stdf)
@@ -95,7 +95,10 @@ class Application(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.cellClicked.connect(self.show_content_table)
 
+        self.update_mod_record.setEnabled(False)
+
     def modify_content_table(self):
+        self.update_mod_record.setEnabled(False)
         data = {}
         for row in range(self.record_content_table.rowCount()):
             tmp_field = self.record_content_table.item(row, 0).text()
@@ -149,9 +152,10 @@ class Application(QWidget):
                 tmp = self.w.pack_record(self.rec_name, data)
                 new_buffer.write(tmp)
                 # copy the rest of the file
-                # old_buffer.seek(self.next_position)
-                tmp = old_buffer.read()
-                new_buffer.write(tmp)
+                if self.next_position != -1:
+                    old_buffer.seek(self.next_position)
+                    tmp = old_buffer.read()
+                    new_buffer.write(tmp)
         elif self.filename.endswith(".gz"):
             with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz', 'wb') as new_buffer:
                 # copy until nth byte
@@ -162,8 +166,10 @@ class Application(QWidget):
                 tmp = self.w.pack_record(self.rec_name, data)
                 new_buffer.write(tmp)
                 # copy the rest of the file
-                tmp = old_buffer.read()
-                new_buffer.write(tmp)
+                if self.next_position != -1:
+                    old_buffer.seek(self.next_position)
+                    tmp = old_buffer.read()
+                    new_buffer.write(tmp)
 
     # To show records in stdf file
     def show_table(self):
@@ -226,12 +232,12 @@ class Application(QWidget):
             index = 0
         self.position = self.stdf_dic[key][index]
 
-        # self.next_position = -1
-        # if index + 1 <= len(self.stdf_dic[key]) - 1:
-        #     self.next_position = self.stdf_dic[key][index + 1]
-        # elif row + 1 <= len(self.stdf_dic) - 1:
-        #     key = self.table.item(row + 1, 0).text() + ' - ' + self.table.item(row + 1, 1).text()
-        #     self.next_position = self.stdf_dic[key][0]
+        self.next_position = -1
+        if index + 1 <= len(self.stdf_dic[key]) - 1:
+            self.next_position = self.stdf_dic[key][index + 1]
+        elif row + 1 <= len(self.stdf_dic) - 1:
+            key = self.table.item(row + 1, 0).text() + ' - ' + self.table.item(row + 1, 1).text()
+            self.next_position = self.stdf_dic[key][0]
 
         self.stdf.STDF_IO.seek(self.position)
         self.rec_name, header, body = self.stdf.read_record()
@@ -262,8 +268,15 @@ class Application(QWidget):
             self.record_content_table.setItem(i, 0, field_item)
             self.record_content_table.setItem(i, 1, type_item)
             self.record_content_table.setItem(i, 2, val_item)
+            # execute the line below to every item you need locked
+            self.record_content_table.item(i, 0).setFlags(Qt.ItemIsEnabled)
+            self.record_content_table.item(i, 1).setFlags(Qt.ItemIsEnabled)
+            self.record_content_table.cellEditingStarted.connect(self.enable_modify_button)
             print(str(k) + ": " + str(v))
             i += 1
+
+    def enable_modify_button(self):
+        self.update_mod_record.setEnabled(True)
 
     def load_stdf(self):
         filterboi = 'STDF (*.stdf *.std);;GZ (*.stdf.gz *.std.gz)'
@@ -308,6 +321,17 @@ class Application(QWidget):
         stdf.read_rec_list = False
         self.e = stdf.e
         return stdf_dic
+
+
+class TableWidget(QTableWidget):
+    # Reimplement the edit method of the table - widget, and emit a custom signal:
+    cellEditingStarted = pyqtSignal(int, int)
+
+    def edit(self, index, trigger, event):
+        result = super(TableWidget, self).edit(index, trigger, event)
+        if result:
+            self.cellEditingStarted.emit(index.row(), index.column())
+        return result
 
 
 if __name__ == '__main__':
