@@ -149,6 +149,7 @@ class Application(QWidget):
                 tmp = self.w.pack_record(self.rec_name, data)
                 new_buffer.write(tmp)
                 # copy the rest of the file
+                # old_buffer.seek(self.next_position)
                 tmp = old_buffer.read()
                 new_buffer.write(tmp)
         elif self.filename.endswith(".gz"):
@@ -224,6 +225,14 @@ class Application(QWidget):
         if index < 0 or index > len(self.stdf_dic[key]) - 1:
             index = 0
         self.position = self.stdf_dic[key][index]
+
+        # self.next_position = -1
+        # if index + 1 <= len(self.stdf_dic[key]) - 1:
+        #     self.next_position = self.stdf_dic[key][index + 1]
+        # elif row + 1 <= len(self.stdf_dic) - 1:
+        #     key = self.table.item(row + 1, 0).text() + ' - ' + self.table.item(row + 1, 1).text()
+        #     self.next_position = self.stdf_dic[key][0]
+
         self.stdf.STDF_IO.seek(self.position)
         self.rec_name, header, body = self.stdf.read_record()
         # Refresh the content table
