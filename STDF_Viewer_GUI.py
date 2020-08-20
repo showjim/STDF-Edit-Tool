@@ -31,6 +31,10 @@ class Application(QWidget):
         self.position = 0
         self.rec_name = ''
         self.e = ''
+        self.modify_data = {}
+        self.add_record_flag = False
+        self.del_record_flag = False
+        self.mod_record_flag = False
 
     def setupUI(self):
         # Title and window size
@@ -56,10 +60,10 @@ class Application(QWidget):
         self.update_mod_record.clicked.connect(self.modify_content_table)
         # increase record button
         self.increase_record = QPushButton(qta.icon('fa.plus-square', color='green'), '')
-        self.increase_record.clicked.connect(self.modify_content_table)
+        self.increase_record.clicked.connect(self.add_record)
         # delete record button
         self.delete_record = QPushButton(qta.icon('fa.minus-square', color='red'), '')
-        self.delete_record.clicked.connect(self.modify_content_table)
+        self.delete_record.clicked.connect(self.del_record)
         self.page_index = QComboBox()
 
         row_num = 0  # len(self.stdf_dic)
@@ -96,9 +100,11 @@ class Application(QWidget):
         self.table.cellClicked.connect(self.show_content_table)
 
         self.update_mod_record.setEnabled(False)
+        self.save_stdf_button.setEnabled(False)
 
     def modify_content_table(self):
         self.update_mod_record.setEnabled(False)
+        self.save_stdf_button.setEnabled(True)
         data = {}
         for row in range(self.record_content_table.rowCount()):
             tmp_field = self.record_content_table.item(row, 0).text()
@@ -129,47 +135,7 @@ class Application(QWidget):
                         data[tmp_field] = tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')
                     else:
                         data[tmp_field] = str(tmp_val)
-        # tmp = self.w.pack_record('FAR', data)
-        # self.stdf.STDF_IO.seek(self.position)
-        # self.stdf.STDF_IO.write(tmp)
-        # set the endian
-        self.w.e = self.e
-        # # This is to overwrite the bytes with same length
-        # with open(self.filename, mode='rb+') as fout:
-        #     tmp = self.w.pack_record(self.rec_name, data)
-        #     fout.seek(self.position)
-        #     fout.write(tmp)
-        #     # fout.flush()
-
-        # This is to modify/insert bytes into file
-        if self.filename.endswith(".std") or self.filename.endswith(".stdf"):
-            with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.std', 'wb') as new_buffer:
-                # copy until nth byte
-                if self.position > 1:
-                    tmp = old_buffer.read(self.position)
-                    new_buffer.write(tmp)
-                # insert new content
-                tmp = self.w.pack_record(self.rec_name, data)
-                new_buffer.write(tmp)
-                # copy the rest of the file
-                if self.next_position != -1:
-                    old_buffer.seek(self.next_position)
-                    tmp = old_buffer.read()
-                    new_buffer.write(tmp)
-        elif self.filename.endswith(".gz"):
-            with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz', 'wb') as new_buffer:
-                # copy until nth byte
-                if self.position > 1:
-                    tmp = old_buffer.read(self.position)
-                    new_buffer.write(tmp)
-                # insert new content
-                tmp = self.w.pack_record(self.rec_name, data)
-                new_buffer.write(tmp)
-                # copy the rest of the file
-                if self.next_position != -1:
-                    old_buffer.seek(self.next_position)
-                    tmp = old_buffer.read()
-                    new_buffer.write(tmp)
+        self.modify_data = data
 
     # To show records in stdf file
     def show_table(self):
@@ -275,6 +241,16 @@ class Application(QWidget):
             print(str(k) + ": " + str(v))
             i += 1
 
+    def add_record(self):
+        pass
+        rowPosition = self.table.rowCount()
+        self.table.insertRow(rowPosition)
+
+    def del_record(self):
+        self.del_record_flag = True
+        self.table.removeRow(self.current_row)
+        self.position_delete = self.position
+
     def enable_modify_button(self):
         self.update_mod_record.setEnabled(True)
 
@@ -298,7 +274,52 @@ class Application(QWidget):
                 pass
 
     def save_stdf(self):
-        pass
+        self.save_stdf_button.setEnabled(False)
+        # tmp = self.w.pack_record('FAR', data)
+        # self.stdf.STDF_IO.seek(self.position)
+        # self.stdf.STDF_IO.write(tmp)
+        # set the endian
+        self.w.e = self.e
+        # # This is to overwrite the bytes with same length
+        # with open(self.filename, mode='rb+') as fout:
+        #     tmp = self.w.pack_record(self.rec_name, data)
+        #     fout.seek(self.position)
+        #     fout.write(tmp)
+        #     # fout.flush()
+
+        # This is to modify/insert bytes into file
+        if self.filename.endswith(".std") or self.filename.endswith(".stdf"):
+            with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.std', 'wb') as new_buffer:
+                # copy until nth byte
+                if self.position > 0:
+                    tmp = old_buffer.read(self.position)
+                    new_buffer.write(tmp)
+                # insert new content
+                if self.del_record_flag:
+                    self.del_record_flag = False
+                else:
+                    tmp = self.w.pack_record(self.rec_name, self.modify_data)
+                    new_buffer.write(tmp)
+                # copy the rest of the file
+                if self.next_position != -1:
+                    old_buffer.seek(self.next_position)
+                    tmp = old_buffer.read()
+                    new_buffer.write(tmp)
+        elif self.filename.endswith(".gz"):
+            with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz',
+                                                                         'wb') as new_buffer:
+                # copy until nth byte
+                if self.position > 1:
+                    tmp = old_buffer.read(self.position)
+                    new_buffer.write(tmp)
+                # insert new content
+                tmp = self.w.pack_record(self.rec_name, self.modify_data)
+                new_buffer.write(tmp)
+                # copy the rest of the file
+                if self.next_position != -1:
+                    old_buffer.seek(self.next_position)
+                    tmp = old_buffer.read()
+                    new_buffer.write(tmp)
 
     # Get the records list in stdf file
     def get_all_records(self, stdf):
