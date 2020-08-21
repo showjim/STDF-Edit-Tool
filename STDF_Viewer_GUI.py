@@ -247,9 +247,10 @@ class Application(QWidget):
         self.table.insertRow(rowPosition)
 
     def del_record(self):
+        self.save_stdf_button.setEnabled(True)
         self.del_record_flag = True
         self.table.removeRow(self.current_row)
-        self.position_delete = self.position
+        # self.position_delete = self.position
 
     def enable_modify_button(self):
         self.update_mod_record.setEnabled(True)
