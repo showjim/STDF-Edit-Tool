@@ -101,6 +101,8 @@ class Application(QWidget):
 
         self.update_mod_record.setEnabled(False)
         self.save_stdf_button.setEnabled(False)
+        self.show_next_record.setEnabled(False)
+        self.show_previous_record.setEnabled(False)
 
     def modify_content_table(self):
         self.update_mod_record.setEnabled(False)
@@ -164,14 +166,28 @@ class Application(QWidget):
 
     def show_content_table(self, row, col):
         self.index_in_same_record = 0
-        page_count = int(self.table.item(row, 2).text())
-        # Set the record page combo
-        self.page_list = []
-        for i in range(0, page_count):
-            self.page_list.append(str(i))
-        self.page_index.clear()
-        self.page_index.addItems(self.page_list)
-        self.show_record(row, col, self.index_in_same_record)
+        self.show_next_record.setEnabled(False)
+        self.show_previous_record.setEnabled(False)
+        try:
+            read_current_page = self.table.item(row, 2).text()
+            page_count = int(read_current_page)
+
+            # Set the record page combo
+            self.page_list = []
+            for i in range(0, page_count):
+                self.page_list.append(str(i))
+            if len(self.page_list) > 1:
+                self.show_next_record.setEnabled(True)
+                self.show_previous_record.setEnabled(True)
+
+            self.page_index.clear()
+            self.page_index.addItems(self.page_list)
+            self.show_record(row, col, self.index_in_same_record)
+        except AttributeError:
+            # Show blank form
+            self.record_content_table.setRowCount(0)
+            self.record_content_table.setColumnCount(3)
+            self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
 
     def show_next_content_table(self):
         self.index_in_same_record = int(self.page_index.currentText()) + 1
@@ -243,7 +259,7 @@ class Application(QWidget):
 
     def add_record(self):
         pass
-        rowPosition = self.table.rowCount()
+        rowPosition = self.current_row + 1
         self.table.insertRow(rowPosition)
 
     def del_record(self):
