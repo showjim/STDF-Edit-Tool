@@ -16,8 +16,9 @@ import logging
 import qtawesome as qta
 import time
 import gzip
+from stdf.stdf_type_V4_2007_1 import TYPE
 
-__version__ = 'STDF Viewer Beta V0.2'
+__version__ = 'STDF Viewer Beta V0.3'
 __author__ = 'zhouchao486@gmail.com'
 
 
@@ -29,6 +30,7 @@ class Application(QWidget):
         self.current_row = 0
         self.w = Writer()
         self.position = 0
+        self.rec_len = -4
         self.rec_name = ''
         self.e = ''
         self.modify_data = {}
@@ -66,6 +68,11 @@ class Application(QWidget):
         self.delete_record.clicked.connect(self.del_record)
         self.page_index = QComboBox()
 
+        self.select_new_record = QComboBox()
+        self.select_new_record.addItems(list(TYPE.keys()))
+
+        self.restore_QLE = QLineEdit()
+
         row_num = 0  # len(self.stdf_dic)
         col_num = 4
 
@@ -98,11 +105,14 @@ class Application(QWidget):
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.cellClicked.connect(self.show_content_table)
+        self.select_new_record.currentIndexChanged.connect(self.show_blank_record)
 
         self.update_mod_record.setEnabled(False)
         self.save_stdf_button.setEnabled(False)
         self.show_next_record.setEnabled(False)
         self.show_previous_record.setEnabled(False)
+        self.increase_record.setEnabled(False)
+        self.delete_record.setEnabled(False)
 
     def modify_content_table(self):
         self.update_mod_record.setEnabled(False)
@@ -223,15 +233,16 @@ class Application(QWidget):
 
         self.stdf.STDF_IO.seek(self.position)
         self.rec_name, header, body = self.stdf.read_record()
+        self.rec_len = header[0]
         # Refresh the content table
         self.record_content_table.setRowCount(len(body))
-        self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
         self.record_content_table.setColumnCount(3)
+        self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
         # Fill the content table
         i = 0
         for k, v in body.items():
             field_item = QTableWidgetItem(str(k))
-            type_item = QTableWidgetItem(self.stdf.STDF_TYPE[self.rec_name]['body'][i][1])
+            type_item = QTableWidgetItem(TYPE[self.rec_name]['body'][i][1])
             if isinstance(v, list):
                 tmp_list = []
                 for tmp_v in v:
@@ -257,10 +268,29 @@ class Application(QWidget):
             print(str(k) + ": " + str(v))
             i += 1
 
+    def show_blank_record(self, index):
+        record_name = self.select_new_record.itemText(index)
+        self.rec_name = record_name
+        self.record_content_table.setColumnCount(3)
+        self.record_content_table.setRowCount(len(TYPE[record_name]['body']))
+        self.record_content_table.setHorizontalHeaderLabels(['Field', 'Type', 'Value'])
+        for i in range(len(TYPE[record_name]['body'])):
+            field_item = QTableWidgetItem(TYPE[record_name]['body'][i][0])
+            type_item = QTableWidgetItem(TYPE[record_name]['body'][i][1])
+            val_item = QTableWidgetItem('N/A')
+            self.record_content_table.setItem(i, 0, field_item)
+            self.record_content_table.setItem(i, 1, type_item)
+            self.record_content_table.setItem(i, 2, val_item)
+            self.record_content_table.item(i, 0).setFlags(Qt.ItemIsEnabled)
+            self.record_content_table.item(i, 1).setFlags(Qt.ItemIsEnabled)
+
     def add_record(self):
-        pass
-        rowPosition = self.current_row + 1
-        self.table.insertRow(rowPosition)
+        if self.rec_len != -4:
+            self.add_record_flag = True
+            self.rowPosition = self.current_row + 1
+            self.position += self.rec_len + 4 # or self.next_position
+            self.table.insertRow(self.rowPosition)
+            self.table.setCellWidget(self.rowPosition, 1, self.select_new_record)
 
     def del_record(self):
         self.save_stdf_button.setEnabled(True)
@@ -287,6 +317,9 @@ class Application(QWidget):
                 self.stdf_dic = self.get_all_records(self.stdf)
                 self.show_table()
                 self.setWindowTitle(__version__ + ' - ' + self.filename.split(r'/')[-1])
+
+                self.increase_record.setEnabled(True)
+                self.delete_record.setEnabled(True)
             else:
                 pass
 
@@ -317,11 +350,23 @@ class Application(QWidget):
                 else:
                     tmp = self.w.pack_record(self.rec_name, self.modify_data)
                     new_buffer.write(tmp)
-                # copy the rest of the file
-                if self.next_position != -1:
-                    old_buffer.seek(self.next_position)
+                # Copy current record/the rest records
+                if self.add_record_flag:
+                    self.add_record_flag = False
+                    old_buffer.seek(self.position)
                     tmp = old_buffer.read()
                     new_buffer.write(tmp)
+
+                    tmp = str(self.select_new_record.currentText())
+                    self.table.setCellWidget(self.rowPosition, 1, self.restore_QLE)
+                    self.restore_QLE.setText(tmp)
+                    self.restore_QLE.setEnabled(False)
+                else:
+                    # copy the rest of the file
+                    if self.next_position != -1:
+                        old_buffer.seek(self.next_position)
+                        tmp = old_buffer.read()
+                        new_buffer.write(tmp)
         elif self.filename.endswith(".gz"):
             with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz',
                                                                          'wb') as new_buffer:
