@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 ###################################################
-# STDF Viewer Tool                                #
+# STDF Edit Tool                                  #
 # Version: Beta 0.2                               #
 #                                                 #
 # Aug. 18, 2020                                   #
-# A light STDF viewer and editor Tool               #
+# A light STDF viewer and editor Tool             #
 ###################################################
 import sys
 from PyQt5.QtCore import *
@@ -18,7 +18,7 @@ import time
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
-__version__ = 'STDF Viewer Beta V0.3'
+__version__ = 'STDF Edit Tool Beta V0.3'
 __author__ = 'zhouchao486@gmail.com'
 
 
@@ -122,7 +122,7 @@ class Application(QWidget):
             tmp_field = self.record_content_table.item(row, 0).text()
             tmp_type = self.record_content_table.item(row, 1).text()
             tmp_val = self.record_content_table.item(row, 2).text()
-            if tmp_val == 'N/A': # or tmp_val == ' ': # or tmp_val == '':
+            if tmp_val == 'N/A':  # or tmp_val == ' ': # or tmp_val == '':
                 data[tmp_field] = None
             else:
                 # long/intger data
@@ -288,7 +288,7 @@ class Application(QWidget):
         if self.rec_len != -4:
             self.add_record_flag = True
             self.rowPosition = self.current_row + 1
-            self.position += self.rec_len + 4 # or self.next_position
+            self.position += self.rec_len + 4  # or self.next_position
             self.table.insertRow(self.rowPosition)
             self.table.setCellWidget(self.rowPosition, 1, self.select_new_record)
 
