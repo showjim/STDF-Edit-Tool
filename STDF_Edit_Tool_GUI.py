@@ -47,9 +47,11 @@ class Application(QWidget):
         self.record_content_table = TableWidget(self)
         # Load STDF
         self.load_stdf_button = QPushButton(qta.icon('mdi.folder-open', color='blue'), '')
+        self.load_stdf_button.setToolTip('Load STDF file')
         self.load_stdf_button.clicked.connect(self.load_stdf)
         # Save STDF
         self.save_stdf_button = QPushButton(qta.icon('mdi.content-save', color='blue'), '')
+        self.save_stdf_button.setToolTip('Save as new STDF file')
         self.save_stdf_button.clicked.connect(self.save_stdf)
         # Button show next record
         self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
@@ -59,12 +61,15 @@ class Application(QWidget):
         self.show_previous_record.clicked.connect(self.show_previous_content_table)
         # Update modification button
         self.update_mod_record = QPushButton(qta.icon('mdi.arrow-up-bold-box-outline', color='green'), '')
+        self.update_mod_record.setToolTip('Update modification to memory')
         self.update_mod_record.clicked.connect(self.modify_content_table)
         # increase record button
         self.increase_record = QPushButton(qta.icon('fa.plus-square', color='green'), '')
+        self.increase_record.setToolTip('Add new record')
         self.increase_record.clicked.connect(self.add_record)
         # delete record button
         self.delete_record = QPushButton(qta.icon('fa.minus-square', color='red'), '')
+        self.delete_record.setToolTip('Delete selected record')
         self.delete_record.clicked.connect(self.del_record)
         self.page_index = QComboBox()
 
@@ -91,13 +96,13 @@ class Application(QWidget):
         layout.addWidget(self.update_mod_record, 0, 2, 1, 1)
         layout.addWidget(self.increase_record, 0, 3, 1, 1)
         layout.addWidget(self.delete_record, 0, 4, 1, 1)
-        layout.addWidget(self.table, 1, 0, 32, 18)
+        layout.addWidget(self.table, 1, 0, 32, 16)
         # layout2 = QGridLayout()
-        layout.addWidget(self.show_previous_record, 1, 19, 1, 1)
-        layout.addWidget(self.page_index, 1, 20, 1, 1)
-        layout.addWidget(self.show_next_record, 1, 21, 1, 1)
+        layout.addWidget(self.show_previous_record, 1, 17, 1, 1)
+        layout.addWidget(self.page_index, 1, 18, 1, 1)
+        layout.addWidget(self.show_next_record, 1, 19, 1, 1)
         # self.record_content_table.setLayout(layout2)
-        layout.addWidget(self.record_content_table, 2, 19, 31, 12)
+        layout.addWidget(self.record_content_table, 2, 17, 31, 16)
         # layout.addWidget(self.record_content_table)
         self.setLayout(layout)
 
@@ -406,6 +411,7 @@ class Application(QWidget):
         j = 1  # same record cnt
         last_rec = ''
         tmp_list = []
+        key = ''
         for rec_name, position in stdf:
             tmp_list = [position]
             if rec_name == last_rec:
