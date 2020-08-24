@@ -111,6 +111,8 @@ class Application(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.cellClicked.connect(self.show_content_table)
         self.select_new_record.currentIndexChanged.connect(self.show_blank_record)
+        self.record_content_table.setMouseTracking(True)
+        self.record_content_table.cellEntered.connect(self.show_tips)
 
         self.update_mod_record.setEnabled(False)
         self.save_stdf_button.setEnabled(False)
@@ -118,6 +120,12 @@ class Application(QWidget):
         self.show_previous_record.setEnabled(False)
         self.increase_record.setEnabled(False)
         self.delete_record.setEnabled(False)
+
+    def show_tips(self, row, col):
+        # Use ToolTip to show current text
+        cur_text = self.record_content_table.item(row, col).text()
+        QToolTip.showText(QCursor.pos(), cur_text)
+        pass
 
     def modify_content_table(self):
         self.update_mod_record.setEnabled(False)
