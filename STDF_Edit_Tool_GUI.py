@@ -371,17 +371,32 @@ class Application(QWidget):
             with gzip.open(self.filename, 'rb') as old_buffer, gzip.open(self.filename + '_new.std.gz',
                                                                          'wb') as new_buffer:
                 # copy until nth byte
-                if self.position > 1:
+                if self.position > 0:
                     tmp = old_buffer.read(self.position)
                     new_buffer.write(tmp)
                 # insert new content
-                tmp = self.w.pack_record(self.rec_name, self.modify_data)
-                new_buffer.write(tmp)
-                # copy the rest of the file
-                if self.next_position != -1:
-                    old_buffer.seek(self.next_position)
+                if self.del_record_flag:
+                    self.del_record_flag = False
+                else:
+                    tmp = self.w.pack_record(self.rec_name, self.modify_data)
+                    new_buffer.write(tmp)
+                # Copy current record/the rest records
+                if self.add_record_flag:
+                    self.add_record_flag = False
+                    old_buffer.seek(self.position)
                     tmp = old_buffer.read()
                     new_buffer.write(tmp)
+
+                    tmp = str(self.select_new_record.currentText())
+                    self.table.setCellWidget(self.rowPosition, 1, self.restore_QLE)
+                    self.restore_QLE.setText(tmp)
+                    self.restore_QLE.setEnabled(False)
+                else:
+                    # copy the rest of the file
+                    if self.next_position != -1:
+                        old_buffer.seek(self.next_position)
+                        tmp = old_buffer.read()
+                        new_buffer.write(tmp)
 
     # Get the records list in stdf file
     def get_all_records(self, stdf):
