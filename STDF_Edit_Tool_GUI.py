@@ -17,7 +17,7 @@ import qtawesome as qta
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
-__version__ = 'STDF Edit Tool Beta V0.3'
+__version__ = 'STDF Edit Tool Beta V0.4'
 __author__ = 'zhouchao486@gmail.com'
 
 
