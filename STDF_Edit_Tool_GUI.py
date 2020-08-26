@@ -14,7 +14,6 @@ from stdf.stdf_reader import Reader
 from stdf.stdf_writer import Writer
 import logging
 import qtawesome as qta
-import time
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 

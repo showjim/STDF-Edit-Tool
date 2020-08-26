@@ -16,13 +16,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE."""
 
-import json
 import io
 import struct
 import logging
 import re
 import math
-from os import path
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
