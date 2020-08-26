@@ -224,7 +224,11 @@ class Reader:
             fmt, buf = self.__get_format_and_buffer(fmt_act, body_raw)
 
             if fmt:
-                d = struct.unpack(self.e + fmt, buf)
+                try:
+                    d = struct.unpack(self.e + fmt, buf)
+                except struct.error:
+                    fmt = str(len(buf)) + fmt[-1]
+                    d = struct.unpack(self.e + fmt, buf)
                 data = d[0] if len(d) == 1 else d
             odd_nibble = True
 
@@ -253,7 +257,10 @@ class Reader:
 
         elif fmt_raw == 'Cn':
             buf = body_raw.read(1)
-            n, = struct.unpack(self.e + 'B', buf)
+            if buf != b'':
+                n, = struct.unpack(self.e + 'B', buf)
+            else:
+                n = 0
             posfix = 's'
 
         elif fmt_raw == 'Bn':
