@@ -353,7 +353,7 @@ class Application(QWidget):
         if self.filename.endswith(".std") or self.filename.endswith(".stdf"):
             with open(self.filename, 'rb') as old_buffer, open(self.filename + '_new.std', 'wb') as new_buffer:
                 # copy until nth byte
-                if self.position > 0:
+                if self.position > 0 and self.del_record_flag == False:
                     tmp = old_buffer.read(self.position)
                     new_buffer.write(tmp)
                 # insert new content

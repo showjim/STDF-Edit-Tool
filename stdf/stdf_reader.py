@@ -88,12 +88,15 @@ class Reader:
         self.log.info('detecting STDF file size = {}'.format(len(self.STDF_IO.getvalue())))
 
     def auto_detect_endian(self):
-        header, rec_name = self._read_and_unpack_header()
-        rec_size, _, _ = header
-        body_raw = self._read_body(rec_size)
-        rec_name, body = self._unpack_body(header, body_raw)
-        self.__set_endian(body['CPU_TYPE'])
-        self.STDF_IO.seek(0)
+        while True:
+            header, rec_name = self._read_and_unpack_header()
+            rec_size, _, _ = header
+            body_raw = self._read_body(rec_size)
+            rec_name, body = self._unpack_body(header, body_raw)
+            if rec_name == 'FAR':
+                self.__set_endian(body['CPU_TYPE'])
+                self.STDF_IO.seek(0)
+                break
 
     def read_record_list(self):
         position = self.STDF_IO.tell()
