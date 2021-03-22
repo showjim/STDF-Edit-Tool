@@ -44,33 +44,55 @@ class Application(QWidget):
 
         self.table = TableWidget(self)
         self.record_content_table = TableWidget(self)
+
         # Load STDF
         self.load_stdf_button = QPushButton(qta.icon('mdi.folder-open', color='blue'), '')
         self.load_stdf_button.setToolTip('Load STDF file')
         self.load_stdf_button.clicked.connect(self.load_stdf)
+
         # Save STDF
         self.save_stdf_button = QPushButton(qta.icon('mdi.content-save', color='blue'), '')
         self.save_stdf_button.setToolTip('Save as new STDF file')
         self.save_stdf_button.clicked.connect(self.save_stdf)
+
         # Button show next record
         self.show_next_record = QPushButton(qta.icon('mdi.skip-next', color='green'), '')
         self.show_next_record.clicked.connect(self.show_next_content_table)
+
         # Button show previous record
         self.show_previous_record = QPushButton(qta.icon('mdi.skip-previous', color='red'), '')
         self.show_previous_record.clicked.connect(self.show_previous_content_table)
+
         # Update modification button
         self.update_mod_record = QPushButton(qta.icon('mdi.arrow-up-bold-box-outline', color='green'), '')
         self.update_mod_record.setToolTip('Update modification to memory')
         self.update_mod_record.clicked.connect(self.modify_content_table)
+
         # increase record button
         self.increase_record = QPushButton(qta.icon('fa.plus-square', color='green'), '')
         self.increase_record.setToolTip('Add new record')
         self.increase_record.clicked.connect(self.add_record)
+
         # delete record button
         self.delete_record = QPushButton(qta.icon('fa.minus-square', color='red'), '')
         self.delete_record.setToolTip('Delete selected record')
         self.delete_record.clicked.connect(self.del_record)
+
         self.page_index = QComboBox()
+
+        # vertical line
+        self.line = QFrame()
+        self.line.setFrameShape(QFrame.VLine|QFrame.Sunken)
+
+        # merge stdf files button
+        self.merge_stdf = QPushButton(qta.icon('mdi.call-merge', color='green'), '')
+        self.merge_stdf.setToolTip('merge STDF files')
+        self.merge_stdf.clicked.connect(self.merge_stdf_files)
+
+        # split stdf file button
+        self.split_stdf = QPushButton(qta.icon('mdi.call-split', color='red'), '')
+        self.split_stdf.setToolTip('split STDF file')
+        self.split_stdf.clicked.connect(self.split_stdf_file)
 
         self.select_new_record = QComboBox()
         self.select_new_record.addItems(list(TYPE.keys()))
@@ -95,6 +117,9 @@ class Application(QWidget):
         layout.addWidget(self.update_mod_record, 0, 2, 1, 1)
         layout.addWidget(self.increase_record, 0, 3, 1, 1)
         layout.addWidget(self.delete_record, 0, 4, 1, 1)
+        layout.addWidget(self.line, 0, 5, 1, 1)
+        layout.addWidget(self.merge_stdf, 0, 6, 1, 1)
+        layout.addWidget(self.split_stdf, 0, 7, 1, 1)
         layout.addWidget(self.table, 1, 0, 32, 16)
         # layout2 = QGridLayout()
         layout.addWidget(self.show_previous_record, 1, 17, 1, 1)
@@ -119,11 +144,39 @@ class Application(QWidget):
         self.show_previous_record.setEnabled(False)
         self.increase_record.setEnabled(False)
         self.delete_record.setEnabled(False)
+        self.merge_stdf.setEnabled(True)
 
     def show_tips(self, row, col):
         # Use ToolTip to show current text
         cur_text = self.record_content_table.item(row, col).text()
         QToolTip.showText(QCursor.pos(), cur_text)
+        pass
+
+    # select multiple stdf files and merge them one by one follow selected order
+    def merge_stdf_files(self):
+        filterboi = 'STDF (*.stdf *.std)'
+        filepath = QFileDialog.getOpenFileNames(
+            caption='Select STDF Files To Merge', filter=filterboi)
+        # Open std file/s
+        if len(filepath[0]) == 0:
+            pass
+        else:
+            if len(filepath[0]) > 1:
+                self.filenamelist = filepath[0]
+                with open(self.filenamelist[0] + '_merge.std', 'ab') as new_buffer:
+                    for filename in self.filenamelist:
+                        with open(filename, 'rb') as old_buffer:
+                            old_buffer.seek(0)
+                            tmp = old_buffer.read()
+                            new_buffer.write(tmp)
+
+
+            else:
+                QMessageBox.information(self, 'Merge interrupt', 'Only one file selected !', QMessageBox.Ok)
+                pass
+
+    # split stdf file into 2 files
+    def split_stdf_file(self):
         pass
 
     def modify_content_table(self):
