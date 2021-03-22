@@ -17,7 +17,7 @@ import qtawesome as qta
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
-__version__ = 'STDF Edit Tool Beta V0.4'
+__version__ = 'STDF Edit Tool Beta V0.5'
 __author__ = 'zhouchao486@gmail.com'
 
 
@@ -241,7 +241,20 @@ class Application(QWidget):
 
     # split stdf file into 2 files
     def split_stdf_file(self):
-        pass
+        row = self.table.currentRow()
+        if row > 0:
+            key = self.table.item(row, 0).text() + ' - ' + self.table.item(row, 1).text()
+            self.position = self.stdf_dic[key][0]
+            with open(self.filename, 'rb') as old_buffer:
+                with open(self.filename + '_split_1.std', 'wb') as new_buffer:
+                    old_buffer.seek(0)
+                    tmp = old_buffer.read(self.position)
+                    new_buffer.write(tmp)
+                with open(self.filename + '_split_2.std', 'wb') as new_buffer:
+                    old_buffer.seek(self.position)
+                    tmp = old_buffer.read()
+                    new_buffer.write(tmp)
+
 
     def modify_content_table(self):
         self.update_mod_record.setEnabled(False)
