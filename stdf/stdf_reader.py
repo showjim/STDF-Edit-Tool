@@ -90,13 +90,19 @@ class Reader:
     def auto_detect_endian(self):
         while True:
             header, rec_name = self._read_and_unpack_header()
-            rec_size, _, _ = header
-            body_raw = self._read_body(rec_size)
-            rec_name, body = self._unpack_body(header, body_raw)
-            if rec_name == 'FAR':
-                self.__set_endian(body['CPU_TYPE'])
+            if header:
+                rec_size, _, _ = header
+                body_raw = self._read_body(rec_size)
+                rec_name, body = self._unpack_body(header, body_raw)
+                if rec_name == 'FAR':
+                    self.__set_endian(body['CPU_TYPE'])
+                    self.STDF_IO.seek(0)
+                    break
+            else:
+                self.e = '@'
                 self.STDF_IO.seek(0)
                 break
+                # self.__set_endian(body['CPU_TYPE'])
 
     def read_record_list(self):
         position = self.STDF_IO.tell()
