@@ -94,6 +94,20 @@ class Application(QWidget):
         self.split_stdf.setToolTip('split STDF file')
         self.split_stdf.clicked.connect(self.split_stdf_file)
 
+        # vertical line
+        self.line2 = QFrame()
+        self.line2.setFrameShape(QFrame.VLine | QFrame.Sunken)
+
+        # record search QLineEdit
+        self.search_record = QLineEdit()
+        self.search_record_btn = QPushButton(qta.icon('fa.search', color='blue'), '')
+        self.search_record_btn.setToolTip('go to the result line')
+        self.search_record_btn.clicked.connect(self.search_stdf_files)
+        self.show_next_search_result_btn = QPushButton(qta.icon('ei.caret-down', color='green'), '')
+        self.show_next_search_result_btn.clicked.connect(self.show_next_search_result)
+        self.show_previous_search_result_btn = QPushButton(qta.icon('ei.caret-up', color='red'), '')
+        self.show_previous_search_result_btn.clicked.connect(self.show_previous_search_result)
+
         self.select_new_record = QComboBox()
         self.select_new_record.addItems(list(TYPE.keys()))
 
@@ -117,9 +131,16 @@ class Application(QWidget):
         layout.addWidget(self.update_mod_record, 0, 2, 1, 1)
         layout.addWidget(self.increase_record, 0, 3, 1, 1)
         layout.addWidget(self.delete_record, 0, 4, 1, 1)
+
         layout.addWidget(self.line, 0, 5, 1, 1)
         layout.addWidget(self.merge_stdf, 0, 6, 1, 1)
         layout.addWidget(self.split_stdf, 0, 7, 1, 1)
+
+        layout.addWidget(self.line2, 0, 8, 1, 1)
+        layout.addWidget(self.search_record, 0, 9, 1, 6)
+        layout.addWidget(self.show_previous_search_result_btn, 0, 15, 1, 1)
+        layout.addWidget(self.show_next_search_result_btn, 0, 16, 1, 1)
+        layout.addWidget(self.search_record_btn, 0, 17, 1, 1)
         layout.addWidget(self.table, 1, 0, 32, 16)
         # layout2 = QGridLayout()
         layout.addWidget(self.show_previous_record, 1, 17, 1, 1)
@@ -146,6 +167,9 @@ class Application(QWidget):
         self.delete_record.setEnabled(False)
         self.merge_stdf.setEnabled(True)
 
+        self.show_previous_search_result_btn.setEnabled(False)
+        self.show_next_search_result_btn.setEnabled(False)
+
     def show_tips(self, row, col):
         # Use ToolTip to show current text
         cur_text = self.record_content_table.item(row, col).text()
@@ -169,11 +193,51 @@ class Application(QWidget):
                             old_buffer.seek(0)
                             tmp = old_buffer.read()
                             new_buffer.write(tmp)
-
-
             else:
                 QMessageBox.information(self, 'Merge interrupt', 'Only one file selected !', QMessageBox.Ok)
                 pass
+
+    # find the record and go to the result line
+    def search_stdf_files(self):
+        tmpstr = self.search_record.text()
+        if tmpstr != '':
+            self.result_items = self.table.findItems(tmpstr, Qt.MatchExactly)
+            self.show_search_result_index = 0
+            item = self.result_items[self.show_search_result_index]
+            # select the cell
+            item.setSelected(True)
+            # 设置单元格的背脊颜色为红
+            # item.setForeground(QBrush(QColor(255, 0, 0)))
+            row = item.row()
+            # located the row of cell
+            self.table.verticalScrollBar().setSliderPosition(row)
+            self.show_previous_search_result_btn.setEnabled(True)
+            self.show_next_search_result_btn.setEnabled(True)
+
+    def show_next_search_result(self):
+        self.show_search_result_index += 1
+        if self.show_search_result_index < len(self.result_items):
+            item = self.result_items[self.show_search_result_index]
+            # select the cell
+            item.setSelected(True)
+            row = item.row()
+            # located the row of cell
+            self.table.verticalScrollBar().setSliderPosition(row)
+        else:
+            # restore
+            self.show_search_result_index -= 1
+
+    def show_previous_search_result(self):
+        self.show_search_result_index -= 1
+        if self.show_search_result_index >= 0:
+            item = self.result_items[self.show_search_result_index]
+            # select the cell
+            item.setSelected(True)
+            row = item.row()
+            # located the row of cell
+            self.table.verticalScrollBar().setSliderPosition(row)
+        else:
+            self.show_search_result_index += 1
 
     # split stdf file into 2 files
     def split_stdf_file(self):
