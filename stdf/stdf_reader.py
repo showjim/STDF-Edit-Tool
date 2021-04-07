@@ -200,10 +200,12 @@ class Reader:
                     for i in range(n):
                         tmp = body_raw.read(1)
                         idx, = struct.unpack(self.e + 'B', tmp)
-                        fmt_vn = vn_map[idx]
+                        # add if to judge whether the field type is valid
+                        if idx < len(vn_map):
+                            fmt_vn = vn_map[idx]
 
-                        data, odd_nibble = self.__get_data(fmt_vn, body_raw, odd_nibble)
-                        array_data.append(data)
+                            data, odd_nibble = self.__get_data(fmt_vn, body_raw, odd_nibble)
+                            array_data.append(data)
 
                     body[field] = array_data
                     odd_nibble = True
