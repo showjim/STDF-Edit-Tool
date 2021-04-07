@@ -17,7 +17,7 @@ import qtawesome as qta
 import gzip
 from stdf.stdf_type_V4_2007_1 import TYPE
 
-__version__ = 'STDF Edit Tool Beta V0.5'
+__version__ = 'STDF Edit Tool Beta V0.5.1'
 __author__ = 'zhouchao486@gmail.com'
 
 
@@ -202,17 +202,18 @@ class Application(QWidget):
         tmpstr = self.search_record.text()
         if tmpstr != '':
             self.result_items = self.table.findItems(tmpstr, Qt.MatchExactly)
-            self.show_search_result_index = 0
-            item = self.result_items[self.show_search_result_index]
-            # select the cell
-            item.setSelected(True)
-            # 设置单元格的背脊颜色为红
-            # item.setForeground(QBrush(QColor(255, 0, 0)))
-            row = item.row()
-            # located the row of cell
-            self.table.verticalScrollBar().setSliderPosition(row)
-            self.show_previous_search_result_btn.setEnabled(True)
-            self.show_next_search_result_btn.setEnabled(True)
+            if len(self.result_items) > 0:
+                self.show_search_result_index = 0
+                item = self.result_items[self.show_search_result_index]
+                # select the cell
+                item.setSelected(True)
+                # 设置单元格的背脊颜色为红
+                # item.setForeground(QBrush(QColor(255, 0, 0)))
+                row = item.row()
+                # located the row of cell
+                self.table.verticalScrollBar().setSliderPosition(row)
+                self.show_previous_search_result_btn.setEnabled(True)
+                self.show_next_search_result_btn.setEnabled(True)
 
     def show_next_search_result(self):
         self.show_search_result_index += 1
@@ -289,6 +290,8 @@ class Application(QWidget):
                         data[tmp_field] = tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')
                     else:
                         data[tmp_field] = str(tmp_val)
+                elif 'Vn' in tmp_type:
+                    data[tmp_field] = tmp_val.replace('[', '').replace(']', '').replace(' ', '').split(',')
         self.modify_data = data
 
     # To show records in stdf file
