@@ -151,9 +151,9 @@ TYPE = {'FAR': {'rec_typ': 0, 'rec_sub': 10, 'body': [['CPU_TYPE', 'U1'], ['STDF
                          ['LIM_SPEC', 'K0U4'], ['COND_LST', 'K0Cn'], ['CYCO_CNT', 'U2'], ['CYC_OFST', 'K0U8'],
                          ['PMR_CNT', 'U2'], ['PMR_INDX', 'K0U2'], ['CHN_CNT', 'U2'], ['CHN_NUM', 'K0U1'],
                          ['EXP_CNT', 'U2'], ['EXP_DATA', 'K0U1'], ['CAP_CNT', 'U2'], ['CAP_DATA', 'K0U1'],
-                         ['NEW_CNT', 'U2'], ['NEW_DATA', 'K0U1'], ['PAT_CNT', 'U2'], ['PAT_NUM', 'K0U1'],
-                         ['BPOS_CNT', 'U2'], ['BIT_POS', 'K0U1'], ['USR1_CNT', 'U2'], ['USR1', 'K0U1'],
-                         ['USR2_CNT', 'U2'], ['USR2', 'K0U1'], ['USR3_CNT', 'U2'], ['USR3', 'K0U1'], ['TXT_CNT', 'U2'],
+                         ['NEW_CNT', 'U2'], ['NEW_DATA', 'K0U1'], ['PAT_CNT', 'U2'], ['PAT_NUM', 'K0U4'],
+                         ['BPOS_CNT', 'U2'], ['BIT_POS', 'K0U4'], ['USR1_CNT', 'U2'], ['USR1', 'K0U8'],
+                         ['USR2_CNT', 'U2'], ['USR2', 'K0U8'], ['USR3_CNT', 'U2'], ['USR3', 'K0U8'], ['TXT_CNT', 'U2'],
                          ['USER_TXT', 'K0U1']]
                 },
         'BPS': {'rec_typ': 20, 'rec_sub': 10, 'body': [['SEQ_NAME', 'Cn']]},
