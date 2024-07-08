@@ -78,10 +78,11 @@ class Reader:
 
     def load_stdf_file(self, stdf_file):
         self.log.info('opening STDF file = {}'.format(stdf_file))
-        if stdf_file.endswith(".std") or stdf_file.endswith(".stdf"):
+        if (stdf_file.endswith(".std") or stdf_file.endswith(".stdf") or
+                stdf_file.endswith(".STD") or stdf_file.endswith(".STDF")):
             with open(stdf_file, mode='rb') as fs:
                 self.STDF_IO = io.BytesIO(fs.read())
-        elif stdf_file.endswith(".gz"):
+        elif stdf_file.endswith(".gz") or stdf_file.endswith(".GZ"):
             with gzip.open(stdf_file, mode='rb') as fs:
                 self.STDF_IO = io.BytesIO(fs.read())
 
